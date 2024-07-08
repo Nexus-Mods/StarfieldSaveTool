@@ -52,7 +52,7 @@ int isCreation( char name[] )
 typedef struct {
     char magic[12];    //0x04034b50 
     uint headerSize;   // starting after this int
-    uint version; 
+    uint engineVersion; 
     byte saveVersion;
     uint saveNumber; 
     ushort playerNameSize;

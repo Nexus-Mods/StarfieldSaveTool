@@ -61,7 +61,7 @@ See [Example.json](Example.json) for a complete JSON export.
 The `.sfs` file is a compressed file format used by Starfield. The file format is a series of compressed data
 chunks in the Zlib format. The data chunks are compressed using the `Deflate` algorithm.
 
-### HEADER
+### SFS_HEADER
 
 | Name                   | Type      | Description                                                                              |
 |------------------------|-----------|------------------------------------------------------------------------------------------|
@@ -87,43 +87,45 @@ next.
 
 This is decompressed from the `.sfs` save file.
 
+### FILE
+
+| Name                   | Type                        | Description                                    |
+|------------------------|-----------------------------|------------------------------------------------|
+| magic                  | `char[12]`                  | Magic bytes `"SFS_SAVEGAME"`                   |
+| headerSize             | `uint`                      | Total size of header (starting from next byte) |
+| header                 | [HEADER](#HEADER)           | Header data block                              |
+| saveVersion            | `byte`                      | Save file format version. Currently `122`      |
+| currentGameVersionSize | `ushort`                    | Size of the current game version string        |
+| currentGameVersion     | `string`                    | Current game version string                    |
+| createdGameVersionSize | `ushort`                    | Size of the created game version string        |
+| createdGameVersion     | `string`                    | Created game version string                    |
+| pluginInfoSize         | `ushort`                    | Size of the plugin information data            |
+| pluginInfo             | [PLUGIN_INFO](#PLUGIN_INFO) | Plugin information data block                  |
+
+Rest of file has not been worked out yet.
+
 ### HEADER
 
-| Name               | Type       | Description                                                                                                                      |
-|--------------------|------------|----------------------------------------------------------------------------------------------------------------------------------|
-| magic              | `char[12]` | Magic bytes `"SFS_SAVEGAME"`                                                                                                     |
-| headerSize         | `uint`     | Total size of header (starting from next byte)                                                                                   |
-| version            | `uint`     | Version                                                                                                                          |
-| saveVersion        | `byte`     | Save file format version                                                                                                         |
-| saveNumber         | `uint`     | Index of save ingame                                                                                                             |
-| playerNameSize     | `ushort`   | Size of player name string                                                                                                       |
-| playerName         | `string`   | Player name                                                                                                                      |
-| playerLevel        | `uint`     | Player level                                                                                                                     |
-| playerLocationSize | `ushort`   | Size of player location string                                                                                                   |
-| playerLocation     | `string`   | Player location                                                                                                                  |
-| playtimeSize       | `ushort`   | Size of playtime string                                                                                                          |
-| playtime           | `string`   | Total playtime                                                                                                                   |
-| raceNameSize       | `ushort`   | Size of race name string                                                                                                         |
-| raceName           | `string`   | Race name                                                                                                                        |
-| gender             | `ushort`   | Gender. 0=Male, 1=, 2=                                                                                                           |
-| experience         | `float`    | Player's current experience                                                                                                      |
-| experienceRequired | `float`    | Experience points required for next level                                                                                        |
-| time               | `uint64`   | Last played timestamp. [FILETIME](https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime) format. |
-| padding            | `byte[8]`  | Unknown                                                                                                                          |
-| unknown            | `uint`     | Unknown                                                                                                                          |
-
-What follows the HEADER is an INFO block with game version information and plugin size.
-
-### INFO
-
-| Name                   | Type     | Description                             |
-|------------------------|----------|-----------------------------------------|
-| saveVersion            | `byte`   | Version of the save                     |
-| currentGameVersionSize | `ushort` | Size of the current game version string |
-| currentGameVersion     | `string` | Current game version string             |
-| createdGameVersionSize | `ushort` | Size of the created game version string |
-| createdGameVersion     | `string` | Created game version string             |
-| pluginInfoSize         | `ushort` | Size of the plugin information data     |
+| Name               | Type       | Description                                                                       |
+|--------------------|------------|-----------------------------------------------------------------------------------| 
+| version            | `uint`     | Engine version? This is `27`, Fallout 4 was `11`.                                 |
+| saveVersion        | `byte`     | Save file format version. Currently `122`                                         |
+| saveNumber         | `uint`     | Index of save ingame                                                              |
+| playerNameSize     | `ushort`   | Size of player name string                                                        |
+| playerName         | `string`   | Player Name                                                                       |
+| playerLevel        | `uint`     | Player Level                                                                      |
+| playerLocationSize | `ushort`   | Size of Player Location string                                                    |
+| playerLocation     | `string`   | Player Location                                                                   |
+| playtimeSize       | `ushort`   | Size of Playtime string                                                           |
+| playtime           | `string`   | Playtime. `xd.yh.zm.x days.y hours.z minutes` where x=days, y=hours and z=minutes |
+| raceNameSize       | `ushort`   | Size of Race Name string                                                          |
+| raceName           | `string`   | Race Name                                                                         |
+| gender             | `ushort`   | Gender. 0=Male, 1=, 2=                                                            |
+| experience         | `float`    | Player's experience                                                               |
+| experienceRequired | `float`    | Experience required for next level                                                |
+| time               | `FILETIME` | Last played timestamp.                                                            |
+| padding            | `byte[8]`  | Unknown                                                                           |
+| unknown            | `uint`     | Unknown                                                                           |
 
 What follows the INFO block is the PLUGIN_INFO block
 
@@ -180,6 +182,5 @@ Includes the Plugin data above and the following:
 | flags            | `byte[flagsSize]` | Unknown data structure             |
 | hasFlags         | `byte`            | 0=no flags, 1=has flags            |
 
-Rest of file is unknown data.
 
 

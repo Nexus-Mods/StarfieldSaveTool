@@ -6,8 +6,6 @@ namespace StarfieldSaveTool;
 
 public struct Header
 {
-    [JsonIgnore] public char[] magic;
-    [JsonIgnore] public uint headerSize;
     public uint version;
     public byte saveVersion;
     public uint saveNumber;
@@ -28,16 +26,6 @@ public struct Header
     public uint unknown0;  
     [JsonIgnore] public byte[] padding;
 }
-
-public struct Info
-{
-    public byte saveVersion;
-    [JsonIgnore] public ushort currentGameVersionSize;
-    public string currentGameVersion;
-    [JsonIgnore] public ushort createdGameVersionSize;
-    public string createdGameVersion;
-    [JsonIgnore] public ushort pluginInfoSize;
-} 
 
 public struct PluginInfo {
     
@@ -81,8 +69,15 @@ public class CreationPlugin : PluginBase
 
 public class DecompressedSaveFile(Stream stream)
 {
+    private char[] _magic;
+    private uint _headerSize;
     [JsonProperty] private Header _header;
-    [JsonProperty] private Info _info;
+    [JsonProperty] private byte saveVersion;
+    private ushort currentGameVersionSize;
+    [JsonProperty] private string currentGameVersion;
+    private ushort createdGameVersionSize;
+    [JsonProperty] private string createdGameVersion;
+    private ushort pluginInfoSize;
     [JsonProperty] private PluginInfo _pluginInfo;
     
     private Stream _stream = stream;
@@ -97,17 +92,26 @@ public class DecompressedSaveFile(Stream stream)
         br.BaseStream.Seek(0, SeekOrigin.Begin);
 
         // quick check for magic bytes
-        var magic = br.ReadBytes(12);
+        _magic = br.ReadChars(12);
             
-        if (Encoding.ASCII.GetString(magic) != SAVE_MAGIC)
+        if (new string(_magic) != SAVE_MAGIC)
         {
-            //_logger.Error("Invalid file format");
+            _logger.Error("Invalid file format");
             throw new Exception($"Not a valid decompressed Starfield save. Magic bytes not found.");
         }
-
+        
+        _headerSize = br.ReadUInt32();
+        
         _header = ReadHeader(br);
-        _info = ReadInfo(br);
-        _pluginInfo = ReadPluginInfo(br, _info.saveVersion);
+        
+        saveVersion = br.ReadByte();
+        currentGameVersionSize = br.ReadUInt16();
+        currentGameVersion = Encoding.ASCII.GetString(br.ReadBytes(currentGameVersionSize));
+        createdGameVersionSize = br.ReadUInt16();
+        createdGameVersion = Encoding.ASCII.GetString(br.ReadBytes(createdGameVersionSize));
+        pluginInfoSize = br.ReadUInt16();
+        
+        _pluginInfo = ReadPluginInfo(br, saveVersion);
     }
 
     public string ToJson()
@@ -220,29 +224,10 @@ public class DecompressedSaveFile(Stream stream)
 
     }
 
-    private Info ReadInfo(BinaryReader br)
-    {
-        var info = new Info();
-        
-        info.saveVersion = br.ReadByte();
-        info.currentGameVersionSize = br.ReadUInt16();
-        info.currentGameVersion = Encoding.ASCII.GetString(br.ReadBytes(info.currentGameVersionSize));
-        info.createdGameVersionSize = br.ReadUInt16();
-        info.createdGameVersion = Encoding.ASCII.GetString(br.ReadBytes(info.createdGameVersionSize));
-        info.pluginInfoSize = br.ReadUInt16();
-            
-        return info;
-    }
-
     static Header ReadHeader(BinaryReader br)
     {
         var header = new Header();
         
-        // reset position to start of file
-        br.BaseStream.Seek(0, SeekOrigin.Begin);
-        
-        header.magic = br.ReadChars(12);
-        header.headerSize = br.ReadUInt32();
         header.version = br.ReadUInt32();
         header.saveVersion = br.ReadByte();
         header.saveNumber = br.ReadUInt32();
