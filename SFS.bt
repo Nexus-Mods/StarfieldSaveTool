@@ -17,16 +17,16 @@ LittleEndian();
 typedef struct {
     char magic[4] <style=sHeading1Accent>;    //0x04034b50
     uint version;
-    uint64 dataOffset;
+    uint64 chunkSizesOffset;
     uint64 unknown0;
     uint64 compressedDataOffset;
     uint64 uncompressedDataSize;
-    float version;
+    float version2;
     uint unknown1;
     uint64 sizeUncompressedChunks;
     uint64 paddingSize;
     uint unknown2;
-    char zip[4];
+    char compressionType[4];
     local uint64 numberOfchunks = Ceil((float) header.uncompressedDataSize / header.sizeUncompressedChunks);    
     uint compressedChunkSizes[numberOfchunks];
 } HEADER;

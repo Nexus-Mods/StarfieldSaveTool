@@ -132,9 +132,9 @@ typedef struct {
     byte unknown0;
     byte count0;
     
-    byte plugincount;
-    Printf("===== plugins (%d)\n", plugincount);
-    PLUGIN plugins[plugincount] <optimize=false>;
+    byte pluginCount;
+    Printf("===== plugins (%d)\n", pluginCount);
+    PLUGIN plugins[pluginCount] <optimize=false>;
     
     ushort lightPluginCount;
     Printf("===== light plugins (%d)\n", lightPluginCount);

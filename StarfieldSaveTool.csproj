@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="StarfieldSaveTool.bat">
+      <None Update="Launch.bat">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

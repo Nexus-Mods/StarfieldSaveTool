@@ -12,8 +12,8 @@ namespace StarfieldSaveTool;
 struct SfsFileHeader
 {
     public char[] magic;
-    public int version;
-    public long dataOffset;
+    public int version0;
+    public long chunkSizesOffset;
     public long unknown0;
     public long compressedDataOffset;
     public long uncompressedDataSize;
@@ -22,7 +22,7 @@ struct SfsFileHeader
     public long sizeUncompressedChunks;
     public long paddingSize;
     public int unknown2;
-    public char[] zip;
+    public char[] compressionType;
     public int chunkCount;
     public int[] compressedChunkSizes;
     public int[] compressedChunkSizesWithoutPadding;
@@ -172,8 +172,8 @@ class Program
         var sfsFileHeader = new SfsFileHeader();
         
         sfsFileHeader.magic = br.ReadChars(4);
-        sfsFileHeader.version = br.ReadInt32();
-        sfsFileHeader.dataOffset = br.ReadInt64();
+        sfsFileHeader.version0 = br.ReadInt32();
+        sfsFileHeader.chunkSizesOffset = br.ReadInt64();
         sfsFileHeader.unknown0 = br.ReadInt64();
         sfsFileHeader.compressedDataOffset = br.ReadInt64();
         sfsFileHeader.uncompressedDataSize = br.ReadInt64();
@@ -182,7 +182,7 @@ class Program
         sfsFileHeader.sizeUncompressedChunks = br.ReadInt64();
         sfsFileHeader.paddingSize = br.ReadInt64();
         sfsFileHeader.unknown2 = br.ReadInt32();
-        sfsFileHeader.zip = br.ReadChars(4);
+        sfsFileHeader.compressionType = br.ReadChars(4);
         sfsFileHeader.chunkCount = (int)Math.Ceiling((float)sfsFileHeader.uncompressedDataSize / sfsFileHeader.sizeUncompressedChunks);
         sfsFileHeader.compressedChunkSizes = new int[sfsFileHeader.chunkCount];
         sfsFileHeader.compressedChunkSizesWithoutPadding = new int[sfsFileHeader.chunkCount];

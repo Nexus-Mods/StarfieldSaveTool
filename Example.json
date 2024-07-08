@@ -1,0 +1,172 @@
+﻿{
+  "_header": {
+    "version": 27,
+    "saveVersion": 122,
+    "saveNumber": 1,
+    "playerName": "Player",
+    "playerLevel": 1,
+    "playerLocation": "Volii Alpha - Volii Alpha",
+    "playtime": "0d.0h.4m.0 days.0 hours.4 minutes",
+    "raceName": "HumanRace",
+    "gender": 0,
+    "experience": 40.0,
+    "experienceRequired": 200.0,
+    "dateTime": "2024-07-01T22:48:15.3971934Z",
+    "unknown0": 0
+  },
+  "_info": {
+    "saveVersion": 122,
+    "currentGameVersion": "1.12.32.0",
+    "createdGameVersion": "1.12.32.0"
+  },
+  "_pluginInfo": {
+    "PluginCount": 15,
+    "LightPluginCount": 18,
+    "MediumPluginCount": 6,
+    "Plugins": [
+      {
+        "PluginName": "Starfield.esm"
+      },
+      {
+        "PluginName": "BlueprintShips-Starfield.esm"
+      },
+      {
+        "CreationName": "TGs Luxury Homes Volume I",
+        "CreationId": "TM_3232667a-c443-48a1-8719-1d3978bc4cd9",
+        "PluginName": "tankgirlsmodelhome.esm"
+      },
+      {
+        "PluginName": "StarfieldCommunityPatch.esm"
+      },
+      {
+        "PluginName": "SFCP_1043.esm"
+      },
+      {
+        "PluginName": "SKKFastStartNewGame.esm"
+      },
+      {
+        "PluginName": "SH_Armor.esm"
+      },
+      {
+        "PluginName": "Lovers Utility Library.esm"
+      },
+      {
+        "PluginName": "SKKStalkersFollowers.esm"
+      },
+      {
+        "PluginName": "Ship Power Fix.esm"
+      },
+      {
+        "PluginName": "Starfarer's Hairstyles.esm"
+      },
+      {
+        "PluginName": "DK-Follower.esp"
+      },
+      {
+        "PluginName": "DK-NPC.esp"
+      },
+      {
+        "PluginName": "oltTest_DialogueNPCNew.esp"
+      },
+      {
+        "PluginName": "DKCassimaWu.esp"
+      }
+    ],
+    "LightPlugins": [
+      {
+        "PluginName": "Constellation.esm"
+      },
+      {
+        "PluginName": "OldMars.esm"
+      },
+      {
+        "PluginName": "SFBGS007.esm"
+      },
+      {
+        "PluginName": "SFBGS008.esm"
+      },
+      {
+        "CreationName": "Blackout Drumbeat Skin",
+        "CreationId": "TM_31ccf130-4852-417b-842a-9d82672028e4",
+        "PluginName": "sfbgs00a_a.esm"
+      },
+      {
+        "CreationName": "Observatory",
+        "CreationId": "TM_e8ff65fc-7c13-44b3-b8a5-27df6b28007d",
+        "PluginName": "sfbgs021.esm"
+      },
+      {
+        "CreationName": "Starborn Gravis Suit",
+        "CreationId": "TM_beefc7ae-59f4-4934-b2a5-d04e5264f029",
+        "PluginName": "sfbgs023.esm"
+      },
+      {
+        "CreationName": "Robin Locke - UC Fly Girl Companion",
+        "CreationId": "TM_31bc272e-edc6-4d27-a420-2d6d5fd99f79",
+        "PluginName": "unocucflygirl.esm"
+      },
+      {
+        "CreationName": "Desktop Speaker (SSNN Broadcast)",
+        "CreationId": "TM_9abcd3bf-ba88-4140-9746-8d02b68b3474",
+        "PluginName": "ringobungo_apexelectronicsex.esm"
+      },
+      {
+        "CreationName": "Realistic Neon Signs",
+        "CreationId": "TM_7c0ecaca-8647-4f2f-833a-ff2e76aadd5c",
+        "PluginName": "neonsigns.esm"
+      },
+      {
+        "CreationName": "Qasmoke has workbenches",
+        "CreationId": "TM_0a88c365-4a7e-4377-ae18-fbe0e37df40b",
+        "PluginName": "betterqasmoke.esm"
+      },
+      {
+        "CreationName": "FaceReDesign",
+        "CreationId": "TM_78cf4166-6c37-4653-a363-9a23c8d261cd",
+        "PluginName": "FaceRedesign.esm"
+      },
+      {
+        "PluginName": "GalBankPlus.esm"
+      },
+      {
+        "PluginName": "ImprovedFollowerBehavior.esm"
+      },
+      {
+        "PluginName": "gnStaggeredSQs.esm"
+      },
+      {
+        "PluginName": "Better Explosives.esm"
+      },
+      {
+        "PluginName": "Better Mines - Fixed Explosion Delay.esm"
+      },
+      {
+        "PluginName": "Starfield Survival Sandwich.esm"
+      }
+    ],
+    "MediumPlugins": [
+      {
+        "PluginName": "SFBGS006.esm"
+      },
+      {
+        "PluginName": "SFBGS003.esm"
+      },
+      {
+        "CreationName": "Trackers Alliance: The Vulture",
+        "CreationId": "TM_4bf1a31f-46d5-47bf-a5e6-d0f9e2496d0c",
+        "PluginName": "sfta01.esm"
+      },
+      {
+        "CreationName": "StarSim: Mining Conglomerate",
+        "CreationId": "TM_e0004076-6d5f-4b96-b7c9-c257a0e3b892",
+        "PluginName": "qog-miningconglomerate.esm"
+      },
+      {
+        "PluginName": "StarValor.esm"
+      },
+      {
+        "PluginName": "Better Locational Damage.esm"
+      }
+    ]
+  }
+}
