@@ -56,6 +56,12 @@ As the tool always outputs JSON to the console, you can use this tool via anothe
 
 See [Example.json](Example.json) for a complete JSON export.
 
+## Contribute
+
+This is all work in progress and there is plenty more with this file format that needs reverse engineering and explaining. All help is welcome and here are some tools that might help:
+
+* Template files for [.sfs (compressed)](https://github.com/Nexus-Mods/StarfieldSaveTool/blob/master/SFS.bt) and [.sfs (decompressed)](https://github.com/Nexus-Mods/StarfieldSaveTool/blob/master/SFS-decompressed.bt) that can be used in [010 Editor](https://www.sweetscape.com/010editor/).
+
 ## Starfield Save file (.SFS)
 
 The `.sfs` file is a compressed file format used by Starfield. The file format is a series of compressed data
