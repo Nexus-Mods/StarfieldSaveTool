@@ -56,51 +56,45 @@ As the tool always outputs JSON to the console, you can use this tool via anothe
 
 See [Example.json](Example.json) for a complete JSON export.
 
-## File Format - Starfield Save file (.SFS)
+## Starfield Save file (.SFS)
 
 The `.sfs` file is a compressed file format used by Starfield. The file format is a series of compressed data
-chunks in the Zlib format. The data chunks are compressed using the `Deflate` algorithm.
+chunks in the Zlib format. The data chunks are compressed using the `Deflate` algorithm. Here is a work-in-progress breakdown of the binary file format.
 
-### SFS_HEADER
+| Name                   | Type      | Description                                                                                                     |
+|------------------------|-----------|-----------------------------------------------------------------------------------------------------------------|
+| magic                  | `char[4]` | Magic bytes `"BCPS"`                                                                                            |
+| version0               | `uint`    | Version number                                                                                                  |
+| chunkSizesOffset       | `uint64`  | Position where the compressedChunkSizes array begins                                                            |  
+| unknown0               | `uint64`  |                                                                                                                 |
+| compressedDataOffset   | `uint64`  | Position where the compressed chunks begins                                                                     |
+| uncompressedDataSize   | `uint64`  | Size of uncompressed save file                                                                                  |
+| version1               | `float`   | Different version number?                                                                                       |
+| unknown1               | `uint`    |                                                                                                                 |
+| sizeUncompressedChunks | `uint64`  | Size of each uncompressed chunk                                                                                 |
+| paddingSize            | `uint64`  | Determines start of each compressed chunk. Chunks are padded out to the nearest 16 bytes                        |
+| unknown2               | `uint`    |                                                                                                                 |
+| compressionType        | `char[4]` | `"ZIP "`. Might have other compression types? Denotes start of compressed chunks                                |
+| compressedChunkSizes   | `uint[]`  | Array of compressed sizes for each chunk                                                                        |
+| compressedChunks       | `chunk[]` | The size of each chunk is determined by the `compressedChunkSizes` array and is padded to the nearest 16 bytes. |
 
-| Name                   | Type      | Description                                                                              |
-|------------------------|-----------|------------------------------------------------------------------------------------------|
-| magic                  | `char[4]` | Magic bytes `"BCPS"`                                                                     |
-| version0               | `uint`    | Version number                                                                           |
-| chunkSizesOffset       | `uint64`  | Position where the compressedChunkSizes array begins                                     |  
-| unknown0               | `uint64`  |                                                                                          |
-| compressedDataOffset   | `uint64`  | Position where the compressed chunks begins                                              |
-| uncompressedDataSize   | `uint64`  | Size of uncompressed save file                                                           |
-| version1               | `float`   | Different version number?                                                                |
-| unknown1               | `uint`    |                                                                                          |
-| sizeUncompressedChunks | `uint64`  | Size of each uncompressed chunk                                                          |
-| paddingSize            | `uint64`  | Determines start of each compressed chunk. Chunks are padded out to the nearest 16 bytes |
-| unknown2               | `uint`    |                                                                                          |
-| compressionType        | `char[4]` | `"ZIP "`. Might have other compression types? Denotes start of compressed chunks         |
-| compressedChunkSizes   | `uint[]`  | Array of compressed sizes for each chunk                                                 |
 
-What follows is a series of compressed data chunks. The size of each chunk is determined by the `compressedChunkSizes`
-array and is padded to the nearest 16 bytes. These are decompressed to expose the save file, described
-next.
-
-## Decompressed Starfield Save file
-
-This is decompressed from the `.sfs` save file.
+Below is the file that is decompressed from the compressed chunks in the `.sfs` save file as described above.
 
 ### FILE
 
-| Name                   | Type                        | Description                                    |
-|------------------------|-----------------------------|------------------------------------------------|
-| magic                  | `char[12]`                  | Magic bytes `"SFS_SAVEGAME"`                   |
-| headerSize             | `uint`                      | Total size of header (starting from next byte) |
-| header                 | [HEADER](#HEADER)           | Header data block                              |
-| saveVersion            | `byte`                      | Save file format version. Currently `122`      |
-| currentGameVersionSize | `ushort`                    | Size of the current game version string        |
-| currentGameVersion     | `string`                    | Current game version string                    |
-| createdGameVersionSize | `ushort`                    | Size of the created game version string        |
-| createdGameVersion     | `string`                    | Created game version string                    |
-| pluginInfoSize         | `ushort`                    | Size of the plugin information data            |
-| pluginInfo             | [PLUGIN_INFO](#PLUGIN_INFO) | Plugin information data block                  |
+| Name                   | Type                        | Description                               |
+|------------------------|-----------------------------|-------------------------------------------|
+| magic                  | `char[12]`                  | Magic bytes `"SFS_SAVEGAME"`              |
+| headerSize             | `uint`                      | Size of header                            |
+| header                 | [HEADER](#HEADER)           | Header data block                         |
+| saveVersion            | `byte`                      | Save file format version. Currently `122` |
+| currentGameVersionSize | `ushort`                    | Size of the current game version string   |
+| currentGameVersion     | `string`                    | Current game version string               |
+| createdGameVersionSize | `ushort`                    | Size of the created game version string   |
+| createdGameVersion     | `string`                    | Created game version string               |
+| pluginInfoSize         | `ushort`                    | Size of the plugin information data       |
+| pluginInfo             | [PLUGIN_INFO](#PLUGIN_INFO) | Plugin information data block             |
 
 Rest of file has not been worked out yet.
 
@@ -154,6 +148,8 @@ There are 3 different types of Plugin data blocks.
 * Base Plugins consists of just the plugin name.
 * Extended Plugins are Base Plugins with extra info.
 * Creation Plugins are Base Plugins that are associated with a Creation and have extra Creation Club metadata.
+* 
+### Base Plugin
 
 | Name           | Type     | Description         |
 |----------------|----------|---------------------|
@@ -162,7 +158,7 @@ There are 3 different types of Plugin data blocks.
 
 ### Extended Plugin
 
-Includes the Plugin data above and the following:
+Includes the Base Plugin data and the following:
 
 | Name    | Type       | Description            |
 |---------|------------|------------------------|
@@ -170,7 +166,7 @@ Includes the Plugin data above and the following:
 
 ### Creation Plugin
 
-Includes the Plugin data above and the following:
+Includes the Base Plugin data and the following:
 
 | Name             | Type              | Description                        |
 |------------------|-------------------|------------------------------------|
