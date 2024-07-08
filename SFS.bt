@@ -1,0 +1,74 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+
+LittleEndian();
+
+typedef struct {
+    char magic[4] <style=sHeading1Accent>;    //0x04034b50
+    uint version;
+    uint64 dataOffset;
+    uint64 unknown0;
+    uint64 compressedDataOffset;
+    uint64 uncompressedDataSize;
+    float version;
+    uint unknown1;
+    uint64 sizeUncompressedChunks;
+    uint64 paddingSize;
+    uint unknown2;
+    char zip[4];
+    local uint64 numberOfchunks = Ceil((float) header.uncompressedDataSize / header.sizeUncompressedChunks);    
+    uint compressedChunkSizes[numberOfchunks];
+} HEADER;
+
+typedef struct  {
+    byte chunk[header.compressedChunkSizes[i]];
+} CHUNK;
+
+HEADER header;
+
+local int64 fileSize = FileSize();
+
+// go to start of data
+FSeek(header.compressedDataOffset);
+
+local int i;
+local int total;
+local int offset;
+local int paddedSize;
+
+
+for(i = 0; i < header.numberOfchunks; i++ ) {
+        
+    offset = FTell();    
+    paddedSize = padToNearestSize(header.paddingSize, header.compressedChunkSizes[i]);
+    
+    Printf("offset = %d, size = %d, padded_size = %d\n", offset, header.compressedChunkSizes[i], paddedSize);
+    
+    CHUNK chunk; // new chunk 
+    
+    FSeek(offset); // reset back to chunk beginning
+    FSkip(paddedSize); // seek to start of next chunk 
+}
+
+
+
+local uint64 compressedDataSize = fileSize - header.compressedDataOffset;
+
+
+// Function to pad a size to the nearest 16 bytes
+int padToNearestSize(int paddingSize, int size) {
+    local int maxPadSize = paddingSize - 1;    
+    return (size + maxPadSize) & ~maxPadSize;
+}
+

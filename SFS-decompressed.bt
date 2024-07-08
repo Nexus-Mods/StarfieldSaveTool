@@ -1,0 +1,153 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+LittleEndian();
+
+int isGamePlugin( char name[] ) 
+{   
+    if( Strcmp(name, "Starfield.esm") == 0 ) return true;
+    if( Strcmp(name, "Constellation.esm") == 0 ) return true;
+    if( Strcmp(name, "OldMars.esm") == 0 ) return true;
+    if( Strcmp(name, "BlueprintShips-Starfield.esm") == 0 ) return true;
+    if( Strcmp(name, "SFBGS007.esm") == 0 ) return true;
+    if( Strcmp(name, "SFBGS008.esm") == 0 ) return true;
+    if( Strcmp(name, "SFBGS006.esm") == 0 ) return true;
+    if( Strcmp(name, "SFBGS003.esm") == 0 ) return true;
+    
+    return false;
+}
+
+int isCreationPlugin( char name[] ) 
+{   
+    //if( Strcmp(name, "sfbgs00a_a.esm") == 0 ) return true;
+    //if( Strcmp(name, "sfbgs023.esm") == 0 ) return true;
+    
+    local int offset = FTell();
+    
+    local ushort nextShort = ReadShort();
+    
+    if ( nextShort != 0 ) return true;                       
+    
+    return false;
+}
+
+int isCreation( char name[] ) 
+{   
+    if( Strstr(name, ".esm") > -1 ) 
+        return false;
+    
+    return true;
+}
+
+typedef struct {
+    char magic[12];    //0x04034b50 
+    uint headerSize;   // starting after this int
+    uint version; 
+    byte saveVersion;
+    uint saveNumber; 
+    ushort playerNameSize;
+    char playerName[playerNameSize];
+    uint playerLevel;
+    ushort playerLocationSize;
+    char playerLocation[playerLocationSize];
+    ushort playtimeSize;
+    char playtime[playtimeSize];
+    ushort raceNameSize;
+    char raceName[raceNameSize];
+    ushort gender;
+    float experience;
+    float experienceRequired;
+    uint64 time;
+    byte padding[8];
+    uint unknown;
+} HEADER;
+
+typedef struct {
+    byte saveVersion;    
+    ushort currentGameVersionSize;
+    char currentGameVersion[currentGameVersionSize];
+    ushort createdGameVersionSize;
+    char createdGameVersion[createdGameVersionSize];
+    ushort pluginInfoSize;
+} INFO;
+
+typedef struct {
+        
+    ushort pluginNameSize;
+    char pluginName[pluginNameSize]; 
+    
+    if( !isGamePlugin(pluginName) ) {
+        
+        // isn't game plugin so we are expecting some extra info
+        
+        if( isCreationPlugin(pluginName) ) {
+            
+            // is creation plugin extra info
+            
+            ushort creationNameSize;
+            char creationName[creationNameSize]; 
+            ushort creationIdSize;
+            char creationId[creationIdSize];            
+            ushort flagsSize;
+            byte flags[flagsSize];
+            byte hasFlags;
+            Printf("%s is a creation (%s)\n", pluginName, creationName);
+            
+        } else {
+            
+            // is normal plugin extra info
+            
+            Printf("%s is a plugin\n", pluginName);
+            byte unknown[13];  
+        }          
+        
+    } else {
+        
+        Printf("%s is a game plugin\n", pluginName); 
+    }  
+    
+} PLUGIN;
+
+typedef struct {    
+    ushort pluginNameSize;
+    char pluginName[pluginNameSize]; 
+    ushort creationIdSize;
+    char creationId[creationIdSize]; 
+    byte unknown[9]; 
+    Printf("%s is creation\n", pluginName);            
+    
+} CREATION;
+
+typedef struct {
+    byte unknown0;
+    byte count0;
+    
+    byte plugincount;
+    Printf("===== plugins (%d)\n", plugincount);
+    PLUGIN plugins[plugincount] <optimize=false>;
+    
+    ushort lightPluginCount;
+    Printf("===== light plugins (%d)\n", lightPluginCount);
+    PLUGIN lightPlugins[lightPluginCount] <optimize=false>;
+    
+    if(header.saveVersion >= 122) { // newer save format support medium plugins        
+        uint mediumPluginCount;
+        Printf("===== medium plugins (%d)\n", mediumPluginCount); 
+        PLUGIN mediumPlugins[mediumPluginCount] <optimize=false>;
+    }
+    
+} PLUGIN_INFO;
+
+HEADER header;
+INFO info;
+PLUGIN_INFO pluginInfo;
