@@ -89,27 +89,16 @@ typedef struct {
     if( !isGamePlugin(pluginName) ) {
         
         // isn't game plugin so we are expecting some extra info
+
+        ushort creationNameSize;
+        char creationName[creationNameSize]; 
+        ushort creationIdSize;
+        char creationId[creationIdSize];            
+        ushort flagsSize;
+        byte flags[flagsSize];
+        byte achivementCompatible;
         
-        if( isCreationPlugin(pluginName) ) {
-            
-            // is creation plugin extra info
-            
-            ushort creationNameSize;
-            char creationName[creationNameSize]; 
-            ushort creationIdSize;
-            char creationId[creationIdSize];            
-            ushort flagsSize;
-            byte flags[flagsSize];
-            byte hasFlags;
-            Printf("%s is a creation (%s)\n", pluginName, creationName);
-            
-        } else {
-            
-            // is normal plugin extra info
-            
-            Printf("%s is a plugin\n", pluginName);
-            byte unknown[13];  
-        }          
+        Printf("%s is a plugin\n", pluginName);       
         
     } else {
         

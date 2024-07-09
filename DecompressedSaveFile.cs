@@ -53,18 +53,13 @@ public class Plugin : PluginBase
 
 public class ExtendedPlugin : PluginBase
 {
-    [JsonIgnore] public byte[] Unknown { get; set; }
-}
-
-public class CreationPlugin : PluginBase
-{
     [JsonIgnore] public ushort CreationNameSize { get; set; }
     public string CreationName { get; set; }
     [JsonIgnore] public ushort CreationIdSize { get; set; }
     public string CreationId { get; set; }
     [JsonIgnore] public ushort FlagsSize { get; set; }
     [JsonIgnore] public byte[] Flags { get; set; }
-    [JsonIgnore] public byte HasFlags { get; set; }
+    [JsonIgnore] public byte AchievementCompatible { get; set; }
 }
 
 public class DecompressedSaveFile(Stream stream)
@@ -190,38 +185,36 @@ public class DecompressedSaveFile(Stream stream)
             };
         }
 
+        /*
         // read ahead if next short is 00 then it's a creation plugin
         var nextShort = br.ReadUInt16();
 
         // reset position
         br.BaseStream.Seek(-2, SeekOrigin.Current);
+        */
+        
+        // non-native plugin so we are expecting some extra info and possibly creation info
 
-        if (nextShort != 0)
-        {
-            // creation plugin
-            var creationPlugin = new CreationPlugin();
-            creationPlugin.PluginName = pluginName;
-            creationPlugin.CreationNameSize = br.ReadUInt16();
-            creationPlugin.CreationName = Encoding.ASCII.GetString(br.ReadBytes(creationPlugin.CreationNameSize));
-            creationPlugin.CreationIdSize = br.ReadUInt16();
-            creationPlugin.CreationId = Encoding.ASCII.GetString(br.ReadBytes(creationPlugin.CreationIdSize));
-            creationPlugin.FlagsSize = br.ReadUInt16();
-            creationPlugin.Flags = br.ReadBytes(creationPlugin.FlagsSize);
-            creationPlugin.HasFlags = br.ReadByte();
-             
-            _logger.Info($"{pluginName} is a creation plugin ({creationPlugin.CreationName}).");
-            return creationPlugin;
-        }
-        else
-        {
-            // extended plugin
-            ExtendedPlugin extendedPlugin = new ExtendedPlugin();
-            extendedPlugin.PluginName = pluginName;
-            extendedPlugin.Unknown = br.ReadBytes(13);
-            _logger.Info($"{pluginName} is a extended plugin.");
-            return extendedPlugin;
-        }
-
+        // creation plugin
+        var extendedPlugin = new ExtendedPlugin();
+        extendedPlugin.PluginName = pluginName;
+        
+        // creation name not always here
+        extendedPlugin.CreationNameSize = br.ReadUInt16();
+        if(extendedPlugin.CreationNameSize != 0) 
+            extendedPlugin.CreationName = Encoding.ASCII.GetString(br.ReadBytes(extendedPlugin.CreationNameSize));
+        
+        // creation id not always here
+        extendedPlugin.CreationIdSize = br.ReadUInt16();
+        if(extendedPlugin.CreationIdSize != 0) 
+            extendedPlugin.CreationId = Encoding.ASCII.GetString(br.ReadBytes(extendedPlugin.CreationIdSize));
+        
+        extendedPlugin.FlagsSize = br.ReadUInt16();
+        extendedPlugin.Flags = br.ReadBytes(extendedPlugin.FlagsSize);
+        extendedPlugin.AchievementCompatible = br.ReadByte();
+         
+        _logger.Info($"{pluginName} is an extended plugin ({extendedPlugin.CreationName}).");
+        return extendedPlugin;
     }
 
     static Header ReadHeader(BinaryReader br)

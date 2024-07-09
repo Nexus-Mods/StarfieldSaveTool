@@ -10,7 +10,13 @@ as
 we are primarily interested in the metadata.
 
 Thanks to Mod Organizer 2 for it's help to get started writing this tool and to help formalize this file format
-research.
+research. Special thanks to Silarn for the reverse engineering help.
+
+## Contribute
+
+This is all work in progress and there is plenty more with this file format that needs reverse engineering and explaining. All help is welcome and here are some tools that might help:
+
+* Template files for [.sfs (compressed)](https://github.com/Nexus-Mods/StarfieldSaveTool/blob/master/SFS.bt) and [.sfs (decompressed)](https://github.com/Nexus-Mods/StarfieldSaveTool/blob/master/SFS-decompressed.bt) that can be used in [010 Editor](https://www.sweetscape.com/010editor/).
 
 ## Usage
 
@@ -55,12 +61,6 @@ As the tool always outputs JSON to the console, you can use this tool via anothe
 ## Example JSON
 
 See [Example.json](Example.json) for a complete JSON export.
-
-## Contribute
-
-This is all work in progress and there is plenty more with this file format that needs reverse engineering and explaining. All help is welcome and here are some tools that might help:
-
-* Template files for [.sfs (compressed)](https://github.com/Nexus-Mods/StarfieldSaveTool/blob/master/SFS.bt) and [.sfs (decompressed)](https://github.com/Nexus-Mods/StarfieldSaveTool/blob/master/SFS-decompressed.bt) that can be used in [010 Editor](https://www.sweetscape.com/010editor/).
 
 ## Starfield Save file (.SFS)
 
@@ -149,12 +149,11 @@ Medium plugins were added in save file version 122. They are stored after the li
 
 ### PLUGIN
 
-There are 3 different types of Plugin data blocks.
+There are 2 different types of Plugin data blocks.
 
-* Base Plugins consists of just the plugin name.
+* Base Plugins consists of just the plugin name, normally just native game plugins.
 * Extended Plugins are Base Plugins with extra info.
-* Creation Plugins are Base Plugins that are associated with a Creation and have extra Creation Club metadata.
-* 
+
 ### Base Plugin
 
 | Name           | Type     | Description         |
@@ -166,23 +165,12 @@ There are 3 different types of Plugin data blocks.
 
 Includes the Base Plugin data and the following:
 
-| Name    | Type       | Description            |
-|---------|------------|------------------------|
-| unknown | `byte[13]` | Unknown data structure |
-
-### Creation Plugin
-
-Includes the Base Plugin data and the following:
-
-| Name             | Type              | Description                        |
-|------------------|-------------------|------------------------------------|
-| creationNameSize | `ushort`          | Size of Creation Name string       |
-| creationName     | `string`          | Creation Name string               |
-| creationIdSize   | `ushort`          | Size of Creation ID                |
-| creationId       | `string`          | Creation ID. GUID that matches xyz |
-| flagsSize        | `ushort`          | Size of flags data                 |
-| flags            | `byte[flagsSize]` | Unknown data structure             |
-| hasFlags         | `byte`            | 0=no flags, 1=has flags            |
-
-
-
+| Name                  | Type              | Description                                          |
+|-----------------------|-------------------|------------------------------------------------------|
+| creationNameSize      | `ushort`          | Size of Creation Name string. `0` if not a Creation. |
+| creationName          | `string`          | Creation Name string                                 |
+| creationIdSize        | `ushort`          | Size of Creation ID. `0` if not a Creation.          |
+| creationId            | `string`          | Creation ID. GUID that matches xyz                   |
+| flagsSize             | `ushort`          | Size of flags data. Sometimes `0`.                   |
+| flags                 | `byte[flagsSize]` | Unknown data structure                               |
+| achievementCompatible | `byte`            | 0=no, 1=yes                                          |
