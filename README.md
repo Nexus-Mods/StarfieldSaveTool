@@ -109,7 +109,7 @@ Rest of file has not been worked out yet.
 |--------------------|------------|-----------------------------------------------------------------------------------| 
 | version            | `uint`     | Engine version? This is `27`, Fallout 4 was `11`.                                 |
 | saveVersion        | `byte`     | Save file format version. Currently `122`                                         |
-| saveNumber         | `uint`     | Index of save ingame                                                              |
+| saveNumber         | `uint`     | Incremented by 1 each time overwritten                                            |
 | playerNameSize     | `ushort`   | Size of player name string                                                        |
 | playerName         | `string`   | Player Name                                                                       |
 | playerLevel        | `uint`     | Player Level                                                                      |

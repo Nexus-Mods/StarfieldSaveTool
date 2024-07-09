@@ -53,7 +53,7 @@ public struct Plugin
     public string CreationId { get; set; }
     [JsonIgnore] public ushort FlagsSize { get; set; }
     [JsonIgnore] public byte[] Flags { get; set; }
-    [JsonIgnore] public byte AchievementCompatible { get; set; }
+    [JsonIgnore] public byte AchievementFriendly { get; set; }
 }
 
 [JsonSourceGenerationOptions(WriteIndented = true)]
@@ -215,7 +215,7 @@ public class DecompressedSaveFile(Stream stream)
 
         plugin.FlagsSize = br.ReadUInt16();
         plugin.Flags = br.ReadBytes(plugin.FlagsSize);
-        plugin.AchievementCompatible = br.ReadByte();
+        plugin.AchievementFriendly = br.ReadByte();
 
         _logger.Info($"{plugin.PluginName} is a normal plugin ({plugin.CreationName}).");
         return plugin;

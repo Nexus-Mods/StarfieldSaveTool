@@ -96,7 +96,7 @@ typedef struct {
         char creationId[creationIdSize];            
         ushort flagsSize;
         byte flags[flagsSize];
-        byte achivementCompatible;
+        byte achivementFriendly;
         
         Printf("%s is a plugin\n", pluginName);       
         
@@ -106,16 +106,6 @@ typedef struct {
     }  
     
 } PLUGIN;
-
-typedef struct {    
-    ushort pluginNameSize;
-    char pluginName[pluginNameSize]; 
-    ushort creationIdSize;
-    char creationId[creationIdSize]; 
-    byte unknown[9]; 
-    Printf("%s is creation\n", pluginName);            
-    
-} CREATION;
 
 typedef struct {
     byte unknown0;
