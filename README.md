@@ -6,8 +6,7 @@ A tool to decompress and convert Starfield save games to JSON format. Save games
 
 Any help with the file format would be appreciated, the majority of unknowns are in the header of the compressed `sfs`
 file, and the plugins data within the decompressed file. I'm not including the main data blocks of the decompressed file
-as
-we are primarily interested in the metadata.
+as we are primarily interested in the metadata.
 
 Thanks to Mod Organizer 2 for it's help to get started writing this tool and to help formalize this file format
 research. Special thanks to Silarn for the reverse engineering help.
@@ -149,21 +148,17 @@ Medium plugins were added in save file version 122. They are stored after the li
 
 ### PLUGIN
 
-There are 2 different types of Plugin data blocks.
+There are different types of Plugin data blocks.
 
-* Base Plugins consists of just the plugin name, normally just native game plugins.
-* Extended Plugins are Base Plugins with extra info.
-
-### Base Plugin
+* Native game plugins only contain the pluginName
+* Non-native plugins contain extra data, including Creation information and flags where appropriate. 
 
 | Name           | Type     | Description         |
 |----------------|----------|---------------------|
 | pluginNameSize | `ushort` | Size of plugin name |
 | pluginName     | `string` | Plugin name         |
 
-### Extended Plugin
-
-Includes the Base Plugin data and the following:
+#### Extra Data
 
 | Name                  | Type              | Description                                          |
 |-----------------------|-------------------|------------------------------------------------------|

@@ -1,58 +1,52 @@
 ﻿using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using NLog;
 
 namespace StarfieldSaveTool;
 
+
+
 public struct Header
 {
-    public uint version;
-    public byte saveVersion;
-    public uint saveNumber;
-    [JsonIgnore] public ushort playerNameSize;
-    public string playerName;
-    public uint playerLevel;
-    [JsonIgnore] public ushort playerLocationSize;
-    public string playerLocation;
-    [JsonIgnore] public ushort playtimeSize;
-    public string playtime;
-    [JsonIgnore] public ushort raceNameSize;
-    public string raceName;
-    public ushort gender;
-    public float experience;
-    public float experienceRequired;
-    [JsonIgnore] public ulong time;
-    public DateTime dateTime;  
-    public uint unknown0;  
-    [JsonIgnore] public byte[] padding;
+    public uint Version { get; set; }
+    public byte SaveVersion { get; set; }
+    public uint SaveNumber { get; set; }
+    [JsonIgnore] public ushort PlayerNameSize { get; set; }
+    public string PlayerName { get; set; }
+    public uint PlayerLevel { get; set; }
+    [JsonIgnore] public ushort PlayerLocationSize { get; set; }
+    public string PlayerLocation { get; set; }
+    [JsonIgnore] public ushort PlaytimeSize { get; set; }
+    public string Playtime { get; set; }
+    [JsonIgnore] public ushort RaceNameSize { get; set; }
+    public string RaceName { get; set; }
+    public ushort Gender { get; set; }
+    public float Experience { get; set; }
+    public float ExperienceRequired { get; set; }
+    [JsonIgnore] public ulong Time { get; set; }
+    public DateTime DateTime { get; set; }
+    [JsonIgnore] public uint Unknown0 { get; set; }
+    [JsonIgnore] public byte[] Padding { get; set; }
 }
 
-public struct PluginInfo {
-    
-    [JsonIgnore] public byte[] Padding;
-    
-    public byte PluginCount;
-    public ushort LightPluginCount;
-    public uint MediumPluginCount;
-    
-    public List<PluginBase> Plugins;
-    public List<PluginBase> LightPlugins;
-    public List<PluginBase> MediumPlugins;
+public struct PluginInfo
+{
+    [JsonIgnore] public byte[] Padding { get; set; }
+
+    public byte PluginCount { get; set; }
+    public ushort LightPluginCount { get; set; }
+    public uint MediumPluginCount { get; set; }
+
+    public List<Plugin> Plugins { get; set; }
+    public List<Plugin> LightPlugins { get; set; }
+    public List<Plugin> MediumPlugins { get; set; }
 }
 
-public abstract class PluginBase
+public struct Plugin
 {
     //public ushort PluginNameSize { get; set; }
     public string PluginName { get; set; }
-}
-
-public class Plugin : PluginBase
-{
-    
-}
-
-public class ExtendedPlugin : PluginBase
-{
     [JsonIgnore] public ushort CreationNameSize { get; set; }
     public string CreationName { get; set; }
     [JsonIgnore] public ushort CreationIdSize { get; set; }
@@ -62,98 +56,114 @@ public class ExtendedPlugin : PluginBase
     [JsonIgnore] public byte AchievementCompatible { get; set; }
 }
 
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(DecompressedSaveFile))]
+internal partial class SourceGenerationContext : JsonSerializerContext
+{
+}
+
 public class DecompressedSaveFile(Stream stream)
 {
-    private char[] _magic;
-    private uint _headerSize;
-    [JsonProperty] private Header _header;
-    [JsonProperty] private byte saveVersion;
-    private ushort currentGameVersionSize;
-    [JsonProperty] private string currentGameVersion;
-    private ushort createdGameVersionSize;
-    [JsonProperty] private string createdGameVersion;
-    private ushort pluginInfoSize;
-    [JsonProperty] private PluginInfo _pluginInfo;
-    
+    [JsonIgnore] public char[] Magic { get; private set; }
+    [JsonIgnore] public uint HeaderSize { get; private set; }
+    public Header Header { get; private set; }
+    public byte SaveVersion { get; private set; }
+    [JsonIgnore] public ushort CurrentGameVersionSize { get; private set; }
+    public string CurrentGameVersion { get; private set; } = "";
+    [JsonIgnore] public ushort CreatedGameVersionSize { get; private set; }
+    public string CreatedGameVersion { get; private set; } = "";
+    [JsonIgnore] public ushort PluginInfoSize { get; private set; }
+    public PluginInfo PluginInfo { get; private set; }
+
     private Stream _stream = stream;
     private Logger _logger = LogManager.GetCurrentClassLogger();
-    
+
     const string SAVE_MAGIC = "SFS_SAVEGAME";
-    readonly string[] NATIVE_PLUGINS = { "Starfield.esm", "Constellation.esm", "OldMars.esm", "BlueprintShips-Starfield.esm", "SFBGS007.esm", "SFBGS008.esm", "SFBGS006.esm", "SFBGS003.esm" };
-    
+
+    readonly string[] NATIVE_PLUGINS =
+    {
+        "Starfield.esm", "Constellation.esm", "OldMars.esm", "BlueprintShips-Starfield.esm", "SFBGS007.esm",
+        "SFBGS008.esm", "SFBGS006.esm", "SFBGS003.esm"
+    };
+
     public void ReadFile()
     {
         using var br = new BinaryReader(_stream);
         br.BaseStream.Seek(0, SeekOrigin.Begin);
 
         // quick check for magic bytes
-        _magic = br.ReadChars(12);
-            
-        if (new string(_magic) != SAVE_MAGIC)
+        Magic = br.ReadChars(12);
+
+        if (new string(Magic) != SAVE_MAGIC)
         {
             _logger.Error("Invalid file format");
             throw new Exception($"Not a valid decompressed Starfield save. Magic bytes not found.");
         }
-        
-        _headerSize = br.ReadUInt32();
-        
-        _header = ReadHeader(br);
-        
-        saveVersion = br.ReadByte();
-        currentGameVersionSize = br.ReadUInt16();
-        currentGameVersion = Encoding.ASCII.GetString(br.ReadBytes(currentGameVersionSize));
-        createdGameVersionSize = br.ReadUInt16();
-        createdGameVersion = Encoding.ASCII.GetString(br.ReadBytes(createdGameVersionSize));
-        pluginInfoSize = br.ReadUInt16();
-        
-        _pluginInfo = ReadPluginInfo(br, saveVersion);
+
+        HeaderSize = br.ReadUInt32();
+
+        Header = ReadHeader(br);
+
+        SaveVersion = br.ReadByte();
+        CurrentGameVersionSize = br.ReadUInt16();
+        CurrentGameVersion = Encoding.ASCII.GetString(br.ReadBytes(CurrentGameVersionSize));
+        CreatedGameVersionSize = br.ReadUInt16();
+        CreatedGameVersion = Encoding.ASCII.GetString(br.ReadBytes(CreatedGameVersionSize));
+        PluginInfoSize = br.ReadUInt16();
+
+        PluginInfo = ReadPluginInfo(br, SaveVersion);
     }
 
     public string ToJson()
     {
-        var json = JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
-        return json;
+        var options = new JsonSerializerOptions
+            { 
+                WriteIndented = true, 
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                TypeInfoResolver = SourceGenerationContext.Default
+            };
+        return JsonSerializer.Serialize(this, options);
     }
-    
-    
+
+
     private PluginInfo ReadPluginInfo(BinaryReader br, byte infoSaveVersion)
     {
-        _pluginInfo = new PluginInfo();
+        var pluginInfo = new PluginInfo();
 
-        _pluginInfo.Padding = br.ReadBytes(2);
-        _pluginInfo.PluginCount = br.ReadByte();
-            
-        _pluginInfo.Plugins = new List<PluginBase>();
-        _pluginInfo.LightPlugins = new List<PluginBase>();
-        _pluginInfo.MediumPlugins = new List<PluginBase>();
+        pluginInfo.Padding = br.ReadBytes(2);
+        pluginInfo.PluginCount = br.ReadByte();
+
+        pluginInfo.Plugins = new List<Plugin>();
+        pluginInfo.LightPlugins = new List<Plugin>();
+        pluginInfo.MediumPlugins = new List<Plugin>();
 
         // loop through normal plugins
-        for (int i = 0; i < _pluginInfo.PluginCount; i++)
+        for (int i = 0; i < pluginInfo.PluginCount; i++)
         {
-            _pluginInfo.Plugins.Add(ReadPlugin(br));
+            pluginInfo.Plugins.Add(ReadPlugin(br));
         }
-            
-        _pluginInfo.LightPluginCount = br.ReadUInt16();
-            
+
+        pluginInfo.LightPluginCount = br.ReadUInt16();
+
         // loop through light plugins
-        for (int i = 0; i < _pluginInfo.LightPluginCount; i++)
+        for (int i = 0; i < pluginInfo.LightPluginCount; i++)
         {
-            _pluginInfo.LightPlugins.Add(ReadPlugin(br));
+            pluginInfo.LightPlugins.Add(ReadPlugin(br));
         }
 
         // previous save versions didn't have medium plugins
         if (infoSaveVersion >= 122)
         {
-            _pluginInfo.MediumPluginCount = br.ReadUInt32();
+            pluginInfo.MediumPluginCount = br.ReadUInt32();
 
             // loop through medium plugins
-            for (int i = 0; i < _pluginInfo.MediumPluginCount; i++)
+            for (int i = 0; i < pluginInfo.MediumPluginCount; i++)
             {
-                _pluginInfo.MediumPlugins.Add(ReadPlugin(br));
+                pluginInfo.MediumPlugins.Add(ReadPlugin(br));
             }
         }
 
-        return _pluginInfo;
+        return pluginInfo;
     }
 
     string ReadString(BinaryReader br)
@@ -161,28 +171,26 @@ public class DecompressedSaveFile(Stream stream)
         // read the string from current position
         // made up of an ushort for the size of the string and then the string itself
         var size = br.ReadUInt16();
-        return Encoding.ASCII.GetString(br.ReadBytes(size)); 
+        return Encoding.ASCII.GetString(br.ReadBytes(size));
     }
 
-    private PluginBase ReadPlugin(BinaryReader br)
+    private Plugin ReadPlugin(BinaryReader br)
     {
         // record the current position
         // var offset = br.BaseStream.Position;
 
+        var plugin = new Plugin();
+
         // read the plugin name
-        var pluginName = ReadString(br);
+        plugin.PluginName = ReadString(br);
 
         // reset the position
         //br.BaseStream.Seek(offset, SeekOrigin.Begin);
 
-        if (NATIVE_PLUGINS.Contains(pluginName))
+        if (NATIVE_PLUGINS.Contains(plugin.PluginName))
         {
-            _logger.Info($"{pluginName} is a native plugin.");
-
-            return new Plugin
-            {
-                PluginName = pluginName
-            };
+            _logger.Info($"{plugin.PluginName} is a native plugin.");
+            return plugin;
         }
 
         /*
@@ -192,55 +200,51 @@ public class DecompressedSaveFile(Stream stream)
         // reset position
         br.BaseStream.Seek(-2, SeekOrigin.Current);
         */
-        
+
         // non-native plugin so we are expecting some extra info and possibly creation info
 
-        // creation plugin
-        var extendedPlugin = new ExtendedPlugin();
-        extendedPlugin.PluginName = pluginName;
-        
         // creation name not always here
-        extendedPlugin.CreationNameSize = br.ReadUInt16();
-        if(extendedPlugin.CreationNameSize != 0) 
-            extendedPlugin.CreationName = Encoding.ASCII.GetString(br.ReadBytes(extendedPlugin.CreationNameSize));
-        
+        plugin.CreationNameSize = br.ReadUInt16();
+        if (plugin.CreationNameSize != 0)
+            plugin.CreationName = Encoding.ASCII.GetString(br.ReadBytes(plugin.CreationNameSize));
+
         // creation id not always here
-        extendedPlugin.CreationIdSize = br.ReadUInt16();
-        if(extendedPlugin.CreationIdSize != 0) 
-            extendedPlugin.CreationId = Encoding.ASCII.GetString(br.ReadBytes(extendedPlugin.CreationIdSize));
-        
-        extendedPlugin.FlagsSize = br.ReadUInt16();
-        extendedPlugin.Flags = br.ReadBytes(extendedPlugin.FlagsSize);
-        extendedPlugin.AchievementCompatible = br.ReadByte();
-         
-        _logger.Info($"{pluginName} is an extended plugin ({extendedPlugin.CreationName}).");
-        return extendedPlugin;
+        plugin.CreationIdSize = br.ReadUInt16();
+        if (plugin.CreationIdSize != 0)
+            plugin.CreationId = Encoding.ASCII.GetString(br.ReadBytes(plugin.CreationIdSize));
+
+        plugin.FlagsSize = br.ReadUInt16();
+        plugin.Flags = br.ReadBytes(plugin.FlagsSize);
+        plugin.AchievementCompatible = br.ReadByte();
+
+        _logger.Info($"{plugin.PluginName} is a normal plugin ({plugin.CreationName}).");
+        return plugin;
     }
 
     static Header ReadHeader(BinaryReader br)
     {
         var header = new Header();
-        
-        header.version = br.ReadUInt32();
-        header.saveVersion = br.ReadByte();
-        header.saveNumber = br.ReadUInt32();
-        header.playerNameSize = br.ReadUInt16();
-        header.playerName = Encoding.ASCII.GetString(br.ReadBytes(header.playerNameSize));
-        header.playerLevel = br.ReadUInt32();
-        header.playerLocationSize = br.ReadUInt16();
-        header.playerLocation = Encoding.ASCII.GetString(br.ReadBytes(header.playerLocationSize));
-        header.playtimeSize = br.ReadUInt16();
-        header.playtime = Encoding.ASCII.GetString(br.ReadBytes(header.playtimeSize));
-        header.raceNameSize = br.ReadUInt16();
-        header.raceName = Encoding.ASCII.GetString(br.ReadBytes(header.raceNameSize));
-        header.gender = br.ReadUInt16();
-        header.experience = br.ReadSingle();
-        header.experienceRequired = br.ReadSingle();
-        header.time = br.ReadUInt64();
-        header.dateTime = DateTime.FromFileTimeUtc((long)header.time);
-        header.unknown0 = br.ReadUInt32();
-        header.padding = br.ReadBytes(8);
-            
+
+        header.Version = br.ReadUInt32();
+        header.SaveVersion = br.ReadByte();
+        header.SaveNumber = br.ReadUInt32();
+        header.PlayerNameSize = br.ReadUInt16();
+        header.PlayerName = Encoding.ASCII.GetString(br.ReadBytes(header.PlayerNameSize));
+        header.PlayerLevel = br.ReadUInt32();
+        header.PlayerLocationSize = br.ReadUInt16();
+        header.PlayerLocation = Encoding.ASCII.GetString(br.ReadBytes(header.PlayerLocationSize));
+        header.PlaytimeSize = br.ReadUInt16();
+        header.Playtime = Encoding.ASCII.GetString(br.ReadBytes(header.PlaytimeSize));
+        header.RaceNameSize = br.ReadUInt16();
+        header.RaceName = Encoding.ASCII.GetString(br.ReadBytes(header.RaceNameSize));
+        header.Gender = br.ReadUInt16();
+        header.Experience = br.ReadSingle();
+        header.ExperienceRequired = br.ReadSingle();
+        header.Time = br.ReadUInt64();
+        header.DateTime = DateTime.FromFileTimeUtc((long)header.Time);
+        header.Unknown0 = br.ReadUInt32();
+        header.Padding = br.ReadBytes(8);
+
         return header;
     }
 }

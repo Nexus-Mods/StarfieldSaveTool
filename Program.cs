@@ -3,9 +3,6 @@ using System.CommandLine;
 using System.Diagnostics;
 using System.Text;
 using Ionic.Zlib;
-using System.Xml;
-using Newtonsoft.Json;
-using CompressionMode = Ionic.Zlib.CompressionMode;
 
 namespace StarfieldSaveTool;
 
@@ -27,7 +24,6 @@ struct SfsFileHeader
     public int[] compressedChunkSizes;
     public int[] compressedChunkSizesWithoutPadding;
 }
-
 
 
 class Program
