@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using NLog;
@@ -11,6 +12,7 @@ namespace StarfieldSaveTool;
 
 [JsonSourceGenerationOptions(WriteIndented = true)]
 [JsonSerializable(typeof(DatFile))]
+[JsonSerializable(typeof(SfsFile))]
 internal partial class SourceGenerationContext : JsonSerializerContext
 {
 }
