@@ -26,15 +26,15 @@ jobs:
     - name: Build       
       run: |
         dotnet build --configuration Release --no-restore
-    - name: Publish       
-      run: |
-        dotnet publish -c Release -r win-x64
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4
-      with:
+    #- name: Publish       
+    #  run: |
+    #    dotnet publish -c Release -r win-x64
+    #- name: Upload a Build Artifact
+    #  uses: actions/upload-artifact@v4
+    #  with:
         # Artifact name
         # name: # optional, default is artifact
         # A file, directory or wildcard pattern that describes what to upload
-        path: ${{ github.workspace }}/bin/Release/net8.0/win-x64/publish/**/*
+    #    path: ${{ github.workspace }}/bin/Release/net8.0/win-x64/publish/**/*
         # The desired behavior if no files are found using the provided path.
         # if-no-files-found: # optional, default is warn
