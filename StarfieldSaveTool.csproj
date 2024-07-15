@@ -10,6 +10,7 @@
         <Company>Black Tree Gaming Ltd</Company>
         <AssemblyVersion>1.1.0.0</AssemblyVersion>
         <PublishTrimmed>true</PublishTrimmed>
+        <PublishSingleFile>true</PublishSingleFile>
     </PropertyGroup>
 
     <ItemGroup>
