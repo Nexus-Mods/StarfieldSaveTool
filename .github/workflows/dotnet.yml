@@ -30,11 +30,11 @@ jobs:
       run: |
         dotnet publish  -r win-x64 -c Release -o ../build --self-contained
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4.3.4
+      uses: actions/upload-artifact@v4
       with:
         # Artifact name
         # name: # optional, default is artifact
         # A file, directory or wildcard pattern that describes what to upload
-        path: StarfieldSaveTool/build/
+        path: ${{ github.workspace }}/StarfieldSaveTool/build/**/*
         # The desired behavior if no files are found using the provided path.
         # if-no-files-found: # optional, default is warn
