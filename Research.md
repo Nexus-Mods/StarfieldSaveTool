@@ -1,4 +1,7 @@
 ﻿
+## Pointers
+
+
 
 ## Flags
 
@@ -15,3 +18,28 @@ Creations
 `70 7F 03 29 92 01`  
 `20 1F 01 29 92 01`  
 `D0 B6 3D 74 95 02`
+
+A single save file
+
+plugin flags are: `20 5A DC E4 51 01`  
+creation flags are: `80 4D BE B2 51 01`
+
+
+
+
+
+old `80 A7 58 DD 91 01`  
+new `20 5A DC E4 51 01`
+
+
+old `20 1F 01 29 92 01`  
+new `80 4D BE B2 51 01`
+
+
+
+old
+
+
+new
+
+

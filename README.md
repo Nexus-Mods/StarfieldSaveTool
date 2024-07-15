@@ -64,7 +64,7 @@ See [Example.json](Example.json) for a complete JSON export.
 ## Starfield Save file (.SFS)
 
 The `.sfs` file is a compressed file format used by Starfield. The file format is a series of compressed data
-chunks in the Zlib format. The data chunks are compressed using the `Deflate` algorithm. Here is a work-in-progress breakdown of the binary file format.
+chunks in the Zlib format. The data chunks are compressed using the `Deflate` algorithm using Fast Compression. Here is a work-in-progress breakdown of the binary file format.
 
 | Name                   | Type      | Description                                                                                                     |
 |------------------------|-----------|-----------------------------------------------------------------------------------------------------------------|
@@ -86,7 +86,7 @@ chunks in the Zlib format. The data chunks are compressed using the `Deflate` al
 
 Below is the file that is decompressed from the compressed chunks in the `.sfs` save file as described above.
 
-### FILE
+### Dat file (Decompressed Starfield Save file)
 
 | Name                   | Type                        | Description                               |
 |------------------------|-----------------------------|-------------------------------------------|
@@ -107,11 +107,11 @@ Rest of file has not been worked out yet.
 
 | Name               | Type       | Description                                                                       |
 |--------------------|------------|-----------------------------------------------------------------------------------| 
-| version            | `uint`     | Engine version? This is `27`, Fallout 4 was `11`.                                 |
+| engineVersion     | `uint`     | Engine version? This is `27`, Fallout 4 was `11`.                                 |
 | saveVersion        | `byte`     | Save file format version. Currently `122`                                         |
 | saveNumber         | `uint`     | Incremented by 1 each time overwritten                                            |
 | playerNameSize     | `ushort`   | Size of player name string                                                        |
-| playerName         | `string`   | Player Name                                                                       |
+| playerName         | `string`   | Player Name. Not used in game, only used for load screen?                         |
 | playerLevel        | `uint`     | Player Level                                                                      |
 | playerLocationSize | `ushort`   | Size of Player Location string                                                    |
 | playerLocation     | `string`   | Player Location                                                                   |

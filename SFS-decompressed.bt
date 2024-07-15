@@ -49,9 +49,13 @@ int isCreation( char name[] )
     return true;
 }
 
+
 typedef struct {
-    char magic[12];    //0x04034b50 
-    uint headerSize;   // starting after this int
+    ushort size;
+    char text[size];
+} QSTRING;
+
+typedef struct {
     uint engineVersion; 
     byte saveVersion;
     uint saveNumber; 
@@ -127,6 +131,63 @@ typedef struct {
     
 } PLUGIN_INFO;
 
+typedef struct {    
+    ushort unknown0;
+    uint pointer0;
+    uint pointer1;
+    uint pointer2;
+    uint pointer3;
+    uint pointer4; 
+    uint pointer5;
+    uint pointer6;
+    uint pointer7;
+    uint pointer8;
+    uint pointer9;
+    uint pointer10;
+    uint pointer11; 
+    byte padding[52];    
+} NEW_BLOCK;
+
+typedef struct {    
+    uint pointer0;
+    uint stringsArrayOffset; // strings array offset?
+    uint unknown0;   
+} NEW_BLOCK2;
+
+typedef struct {    
+    uint unknown0;   
+} NEW_BLOCK3;
+
+typedef struct {    
+    byte unknown0[18];
+    byte unknown;   
+    byte unknown1[37];
+} NEW_BLOCK4 <size=56>;
+
+
+typedef struct {  
+    ushort arrayCount;
+    QSTRING strings[arrayCount] <optimize=false>; 
+} STRINGS_ARRAY;
+
+// actual file
+
+char magic[12];    //0x04034b50 
+uint headerSize;   // starting after this int
 HEADER header;
 INFO info;
 PLUGIN_INFO pluginInfo;
+NEW_BLOCK newBlock;
+NEW_BLOCK2 newBlock2;
+
+// unknown block
+FSeek(newBlock.pointer0);
+NEW_BLOCK3 newBlock3;
+
+// unknown block
+FSeek(newBlock.pointer1);
+NEW_BLOCK4 newBlock4;
+
+// start of strings array?
+FSeek(newBlock2.stringsArrayOffset);
+STRINGS_ARRAY stringsArray;

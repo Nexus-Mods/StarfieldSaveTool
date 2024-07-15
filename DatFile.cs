@@ -7,94 +7,101 @@ namespace StarfieldSaveTool;
 
 
 
-public struct Header
-{
-    public uint Version { get; set; }
-    public byte SaveVersion { get; set; }
-    public uint SaveNumber { get; set; }
-    [JsonIgnore] public ushort PlayerNameSize { get; set; }
-    public string PlayerName { get; set; }
-    public uint PlayerLevel { get; set; }
-    [JsonIgnore] public ushort PlayerLocationSize { get; set; }
-    public string PlayerLocation { get; set; }
-    [JsonIgnore] public ushort PlaytimeSize { get; set; }
-    public string Playtime { get; set; }
-    [JsonIgnore] public ushort RaceNameSize { get; set; }
-    public string RaceName { get; set; }
-    public ushort Gender { get; set; }
-    public float Experience { get; set; }
-    public float ExperienceRequired { get; set; }
-    [JsonIgnore] public ulong Time { get; set; }
-    public DateTime DateTime { get; set; }
-    [JsonIgnore] public uint Unknown0 { get; set; }
-    [JsonIgnore] public byte[] Padding { get; set; }
-}
 
-public struct PluginInfo
-{
-    [JsonIgnore] public byte[] Padding { get; set; }
-
-    public byte PluginCount { get; set; }
-    public ushort LightPluginCount { get; set; }
-    public uint MediumPluginCount { get; set; }
-
-    public List<Plugin> Plugins { get; set; }
-    public List<Plugin> LightPlugins { get; set; }
-    public List<Plugin> MediumPlugins { get; set; }
-}
-
-public struct Plugin
-{
-    //public ushort PluginNameSize { get; set; }
-    public string PluginName { get; set; }
-    [JsonIgnore] public ushort CreationNameSize { get; set; }
-    public string CreationName { get; set; }
-    [JsonIgnore] public ushort CreationIdSize { get; set; }
-    public string CreationId { get; set; }
-    [JsonIgnore] public ushort FlagsSize { get; set; }
-    [JsonIgnore] public byte[] Flags { get; set; }
-    [JsonIgnore] public byte AchievementFriendly { get; set; }
-}
 
 [JsonSourceGenerationOptions(WriteIndented = true)]
-[JsonSerializable(typeof(DecompressedSaveFile))]
+[JsonSerializable(typeof(DatFile))]
 internal partial class SourceGenerationContext : JsonSerializerContext
 {
 }
 
-public class DecompressedSaveFile(Stream stream)
+public class DatFile(byte[] data)
 {
-    [JsonIgnore] public char[] Magic { get; private set; }
+    public struct FileHeader
+    {
+        public uint EngineVersion { get; set; }
+        public byte SaveVersion { get; set; }
+        public uint SaveNumber { get; set; }
+        [JsonIgnore] public ushort PlayerNameSize { get; set; }
+        public string PlayerName { get; set; }
+        public uint PlayerLevel { get; set; }
+        [JsonIgnore] public ushort PlayerLocationSize { get; set; }
+        public string PlayerLocation { get; set; }
+        [JsonIgnore] public ushort PlaytimeSize { get; set; }
+        public string Playtime { get; set; }
+        [JsonIgnore] public ushort RaceNameSize { get; set; }
+        public string RaceName { get; set; }
+        public ushort Gender { get; set; }
+        public float Experience { get; set; }
+        public float ExperienceRequired { get; set; }
+        [JsonIgnore] public ulong Time { get; set; }
+        public DateTime DateTime { get; set; }
+        [JsonIgnore] public uint Unknown0 { get; set; }
+        [JsonIgnore] public byte[] Padding { get; set; }
+    }
+
+    public struct FilePluginInfo
+    {
+        [JsonIgnore] public byte[] Padding { get; set; }
+
+        public byte PluginCount { get; set; }
+        public ushort LightPluginCount { get; set; }
+        public uint MediumPluginCount { get; set; }
+
+        public List<FilePlugin> Plugins { get; set; }
+        public List<FilePlugin> LightPlugins { get; set; }
+        public List<FilePlugin> MediumPlugins { get; set; }
+    }
+
+    public struct FilePlugin
+    {
+        //public ushort PluginNameSize { get; set; }
+        public string PluginName { get; set; }
+        [JsonIgnore] public ushort CreationNameSize { get; set; }
+        public string CreationName { get; set; }
+        [JsonIgnore] public ushort CreationIdSize { get; set; }
+        public string CreationId { get; set; }
+        [JsonIgnore] public ushort FlagsSize { get; set; }
+        [JsonIgnore] public byte[] Flags { get; set; }
+        [JsonIgnore] public byte AchievementFriendly { get; set; }
+    }
+    
+    [JsonIgnore] char[] Magic { get; set; }
     [JsonIgnore] public uint HeaderSize { get; private set; }
-    public Header Header { get; private set; }
+
+    public byte JsonVersion { get; private set; } = 1; // json format version
+    public FileHeader Header { get; private set; }
     public byte SaveVersion { get; private set; }
-    [JsonIgnore] public ushort CurrentGameVersionSize { get; private set; }
+    [JsonIgnore] ushort CurrentGameVersionSize { get; set; }
     public string CurrentGameVersion { get; private set; } = "";
-    [JsonIgnore] public ushort CreatedGameVersionSize { get; private set; }
+    [JsonIgnore] ushort CreatedGameVersionSize { get; set; }
     public string CreatedGameVersion { get; private set; } = "";
     [JsonIgnore] public ushort PluginInfoSize { get; private set; }
-    public PluginInfo PluginInfo { get; private set; }
+    public FilePluginInfo PluginInfo { get; private set; }
 
-    private Stream _stream = stream;
+    [JsonIgnore] public byte[] Data { get; private set; } = data;
+
     private Logger _logger = LogManager.GetCurrentClassLogger();
 
-    const string SAVE_MAGIC = "SFS_SAVEGAME";
+    private const string DatMagic = "SFS_SAVEGAME";
 
-    readonly string[] NATIVE_PLUGINS =
+    private readonly string[] NATIVE_PLUGINS =
     {
         "Starfield.esm", "Constellation.esm", "OldMars.esm", "BlueprintShips-Starfield.esm", "SFBGS007.esm",
         "SFBGS008.esm", "SFBGS006.esm", "SFBGS003.esm"
     };
 
-    public void ReadFile()
+    public void ProcessFile()
     {
-        using var br = new BinaryReader(_stream);
+        using var ms = new MemoryStream(Data);
+        using var br = new BinaryReader(ms);
+        
         br.BaseStream.Seek(0, SeekOrigin.Begin);
 
         // quick check for magic bytes
         Magic = br.ReadChars(12);
 
-        if (new string(Magic) != SAVE_MAGIC)
+        if (new string(Magic) != DatMagic)
         {
             _logger.Error("Invalid file format");
             throw new Exception($"Not a valid decompressed Starfield save. Magic bytes not found.");
@@ -114,6 +121,49 @@ public class DecompressedSaveFile(Stream stream)
         PluginInfo = ReadPluginInfo(br, SaveVersion);
     }
 
+    public void ChangeFile()
+    {
+        using var ms = new MemoryStream(Data);
+        
+        // start at beginning
+        ms.Seek(0, SeekOrigin.Begin);
+        
+        // convert utf string to byte array
+        var nameByteArray = "NEXUSM"u8.ToArray();
+        var locationByteArray = "Nexus Mods - Home"u8.ToArray(); 
+        var spacesuitByteArray = "Nexus Mods -- Uniform"u8.ToArray();
+        
+        // change things
+
+        // header: name
+        ms.Seek(27, SeekOrigin.Begin);
+        ms.Write(nameByteArray, 0, nameByteArray.Length); // write byte array to MemoryStream
+        
+        // strings array: name
+        ms.Seek(2340628, SeekOrigin.Begin);
+        ms.Write(nameByteArray, 0, nameByteArray.Length); // write byte array to MemoryStream
+        
+        // header: location
+        ms.Seek(39, SeekOrigin.Begin);
+        ms.Write(locationByteArray, 0, locationByteArray.Length); // write byte array to MemoryStream
+        
+        // strings array: Deep Mining Spacesuit
+        //ms.Seek(2338625, SeekOrigin.Begin);
+        //ms.Write(spacesuitByteArray, 0, spacesuitByteArray.Length); // write byte array to MemoryStream
+        
+        
+        // write stream back to bytes
+        Data = ms.ToArray();
+
+        /*
+        Data[0] = Convert.ToByte('S');
+        Data[1] = Convert.ToByte('I');
+        Data[2] = Convert.ToByte('M');
+        Data[3] = Convert.ToByte('O');
+        Data[4] = Convert.ToByte('N');
+        */
+    }
+
     public string ToJson()
     {
         var options = new JsonSerializerOptions
@@ -126,16 +176,16 @@ public class DecompressedSaveFile(Stream stream)
     }
 
 
-    private PluginInfo ReadPluginInfo(BinaryReader br, byte infoSaveVersion)
+    private FilePluginInfo ReadPluginInfo(BinaryReader br, byte infoSaveVersion)
     {
-        var pluginInfo = new PluginInfo();
+        var pluginInfo = new FilePluginInfo();
 
         pluginInfo.Padding = br.ReadBytes(2);
         pluginInfo.PluginCount = br.ReadByte();
 
-        pluginInfo.Plugins = new List<Plugin>();
-        pluginInfo.LightPlugins = new List<Plugin>();
-        pluginInfo.MediumPlugins = new List<Plugin>();
+        pluginInfo.Plugins = new List<FilePlugin>();
+        pluginInfo.LightPlugins = new List<FilePlugin>();
+        pluginInfo.MediumPlugins = new List<FilePlugin>();
 
         // loop through normal plugins
         for (int i = 0; i < pluginInfo.PluginCount; i++)
@@ -174,12 +224,12 @@ public class DecompressedSaveFile(Stream stream)
         return Encoding.ASCII.GetString(br.ReadBytes(size));
     }
 
-    private Plugin ReadPlugin(BinaryReader br)
+    private FilePlugin ReadPlugin(BinaryReader br)
     {
         // record the current position
         // var offset = br.BaseStream.Position;
 
-        var plugin = new Plugin();
+        var plugin = new FilePlugin();
 
         // read the plugin name
         plugin.PluginName = ReadString(br);
@@ -221,11 +271,11 @@ public class DecompressedSaveFile(Stream stream)
         return plugin;
     }
 
-    static Header ReadHeader(BinaryReader br)
+    static FileHeader ReadHeader(BinaryReader br)
     {
-        var header = new Header();
+        var header = new FileHeader();
 
-        header.Version = br.ReadUInt32();
+        header.EngineVersion = br.ReadUInt32();
         header.SaveVersion = br.ReadByte();
         header.SaveNumber = br.ReadUInt32();
         header.PlayerNameSize = br.ReadUInt16();
