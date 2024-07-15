@@ -22,10 +22,10 @@ jobs:
         dotnet-version: 8.0.x
     - name: Restore dependencies
       run: |
-        dotnet restore
+        dotnet restore --packages .nuget --runtime win-x64
     - name: Build       
       run: |
         dotnet build --configuration Release --no-restore
     - name: Publish       
       run: |
-        dotnet publish -c Release -o ../build --self-contained true --no-restore
+        dotnet publish  -r win-x64 -c Release -o ../build --self-contained
