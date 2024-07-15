@@ -8,6 +8,7 @@
         <IsPackable>false</IsPackable>
         <Company>Black Tree Gaming Ltd</Company>
         <AssemblyVersion>1.1.0.0</AssemblyVersion>
+        <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
 
     <ItemGroup>
