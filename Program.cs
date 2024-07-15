@@ -88,11 +88,11 @@ class Program
                 sw.Restart();
 
                 // test change and write back to file?
-                dat.ChangeFile();
-                logger.Debug($"Compressed {dat.Data.Length} bytes in {sw.Elapsed:ss\\.ffff} seconds.");
+                //dat.ChangeFile();
+                //logger.Debug($"Compressed {dat.Data.Length} bytes in {sw.Elapsed:ss\\.ffff} seconds.");
 
                 // test write back to file
-                var path = @"C:\Users\insom\Desktop\test.sfs";
+                var path = AddSuffixToFilePath(file.FullName, "_modified");
                 sfs.WriteFile(path, dat.Data);
                 logger.Info($"sfs written to {path}");
             }
@@ -134,7 +134,22 @@ class Program
     }
 
      
-
+    public static string AddSuffixToFilePath(string originalFilePath, string suffix)
+    {
+        // Extract the directory path
+        var directoryPath = Path.GetDirectoryName(originalFilePath);
+    
+        // Extract the file name without the extension
+        var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFilePath);
+    
+        // Extract the file extension
+        var fileExtension = Path.GetExtension(originalFilePath);
+    
+        // Concatenate the new file path with the suffix before the extension
+        var newFilePath = Path.Combine(directoryPath, $"{fileNameWithoutExtension}{suffix}{fileExtension}");
+    
+        return newFilePath;
+    }
 
     
     
