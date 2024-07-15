@@ -28,4 +28,4 @@ jobs:
         dotnet build --configuration Release --no-restore
     - name: Publish       
       run: |
-        dotnet publish -r win-x64 -c Release -o ../build --self-contained true --no-restore
+        dotnet publish -c Release -o ../build --self-contained true --no-restore
