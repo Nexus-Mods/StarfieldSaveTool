@@ -4,7 +4,7 @@ using NLog;
 
 namespace StarfieldSaveTool;
 
-public class SfsFile(FileInfo fileInfo)
+public class SfsFile(string file)
 {
     struct FileHeader
     {
@@ -27,8 +27,8 @@ public class SfsFile(FileInfo fileInfo)
     [JsonIgnore] public char[] Magic { get; private set; }
     FileHeader Header { get; set; }
     public byte[] DecompressedChunks { get; private set; } = [];
-    
-    private Stream _fileStream = fileInfo.OpenRead();
+
+    private Stream _fileStream = new FileStream(file, FileMode.Open);
     private Logger _logger = LogManager.GetCurrentClassLogger();
 
     private const string SfsMagic = "BCPS";
@@ -36,6 +36,8 @@ public class SfsFile(FileInfo fileInfo)
 
     public void ProcessFile()
     {
+        _logger.Info($"Processing {file}...");
+        
         using var br = new BinaryReader(_fileStream);
         br.BaseStream.Seek(0, SeekOrigin.Begin);
 

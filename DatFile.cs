@@ -13,11 +13,12 @@ namespace StarfieldSaveTool;
 [JsonSourceGenerationOptions(WriteIndented = true)]
 [JsonSerializable(typeof(DatFile))]
 [JsonSerializable(typeof(SfsFile))]
+[JsonSerializable(typeof(List<DatFile>))]
 internal partial class SourceGenerationContext : JsonSerializerContext
 {
 }
 
-public class DatFile(byte[] data)
+public class DatFile(byte[] data, string filename)
 {
     public struct FileHeader
     {
@@ -71,6 +72,7 @@ public class DatFile(byte[] data)
     [JsonIgnore] char[] Magic { get; set; }
     [JsonIgnore] public uint HeaderSize { get; private set; }
 
+    public string Filename { get; private set; } = "";
     public byte JsonVersion { get; private set; } = 1; // json format version
     public FileHeader Header { get; private set; }
     public byte SaveVersion { get; private set; }
@@ -108,6 +110,8 @@ public class DatFile(byte[] data)
             _logger.Error("Invalid file format");
             throw new Exception($"Not a valid decompressed Starfield save. Magic bytes not found.");
         }
+        
+        Filename = filename;
 
         HeaderSize = br.ReadUInt32();
 
