@@ -43,8 +43,8 @@ jobs:
         echo "version = $version"
         echo "semver = $semver"
         echo "tag = $tag"
-        echo "$version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append 
-        echo "$semver=$semver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        echo "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append 
+        echo "semver=$semver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
         echo "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
     - name: Display Version and Tag
       shell: pwsh
