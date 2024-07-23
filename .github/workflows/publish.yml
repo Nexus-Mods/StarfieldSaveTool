@@ -38,17 +38,20 @@ jobs:
           $version = [xml](Get-Content $csprojPath) | Select-Xml -XPath "//PropertyGroup/Version" | ForEach-Object { $_.Node.InnerXml }
         }
         $semver = $version -replace '(\d+\.\d+\.\d+)\.\d+', '$1'  # Convert to semver by stripping the 4th part
-        echo "semver=$semver"
         echo "version=$version"
+        echo "semver=$semver"
         echo "tag=v$semver"
-        echo "SEMVER=$semver" >> $GITHUB_ENV
-        echo "VERSION=$version" >> $GITHUB_ENV
-        echo "TAG=v$semver" >> $GITHUB_ENV
+        echo "VERSION=$version" >> $GITHUB_OUTPUT
+        echo "SEMVER=$semver" >> $GITHUB_OUTPUT
+        echo "TAG=v$semver" >> $GITHUB_OUTPUT
     - name: Display Version and Tag
-      run: | 
-        echo "Raw Version ${{ env.VERSION }}"
-        echo "SemVer Version ${{ env.SEMVER }}"
-        echo "Tag ${{ env.TAG }}"
+      run: |
+        $version = '${{ steps.extract-version.outputs.VERSION }}'
+        $semver = '${{ steps.extract-version.outputs.SEMVER }}'
+        $tag = '${{ steps.extract-version.outputs.TAG }}'
+        echo "Version: $version"
+        echo "SemVer: $semver"
+        echo "Tag: $tag"
     - name: Build       
       run: |
         dotnet build --configuration Release --no-restore
