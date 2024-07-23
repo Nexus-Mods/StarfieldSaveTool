@@ -9,11 +9,13 @@ namespace StarfieldSaveTool;
 class Program
 {
     private static Logger logger;
+    private const int BufferSize = 65536; // 64 KB
    
     static async Task<int> Main(string[] args)
     {
         var fileArgument = new Argument<FileInfo>(name: "file", description: "Starfield Save File (.sfs) to read");
         
+        var ignoresVersionOption = new Option<bool>(new[] { "--ignore-version", "-i" }, () => false, "Ignores version check and processes file anyway");
         var jsonOutputOption = new Option<bool>(new[] { "--output-json-file", "-j" }, () => false, "Write JSON output to file");
         var rawOutputOption = new Option<bool>(new[] { "--output-raw-file", "-r" }, () => false, "Write raw output to file");
         var changeFileOption = new Option<bool>(new[] { "--change-file", "-c" }, () => false, "Test change and write back to file");
@@ -23,11 +25,12 @@ class Program
             fileArgument,
             jsonOutputOption,
             rawOutputOption,
-            changeFileOption
+            changeFileOption,
+            ignoresVersionOption
         };
         
 
-        rootCommand.SetHandler(Start, fileArgument, jsonOutputOption, rawOutputOption, changeFileOption);
+        rootCommand.SetHandler(Start, fileArgument, jsonOutputOption, rawOutputOption, changeFileOption, ignoresVersionOption);
 
         // logging stuff
 
@@ -35,12 +38,12 @@ class Program
         var config = new NLog.Config.LoggingConfiguration();
 
         // create a console logging target
-        var logConsole = new NLog.Targets.ConsoleTarget();
+        //var logConsole = new NLog.Targets.ConsoleTarget();
 
         var debugConsole = new NLog.Targets.DebugSystemTarget();
 
         // send logs with levels from Info to Fatal to the console
-        config.AddRule(NLog.LogLevel.Warn, NLog.LogLevel.Fatal, logConsole);
+        //config.AddRule(NLog.LogLevel.Warn, NLog.LogLevel.Fatal, logConsole);
         // send logs with levels from Debug to Fatal to the console
         config.AddRule(NLog.LogLevel.Debug, NLog.LogLevel.Fatal, debugConsole);
 
@@ -49,11 +52,21 @@ class Program
 
         // create a logger
         logger = LogManager.GetCurrentClassLogger();
+        
+        // need a bigger stdout buffer for large files
+
+        // Create a new StreamWriter with the desired buffer size
+        var stdoutWriter = new StreamWriter(Console.OpenStandardOutput(), new UTF8Encoding(false), BufferSize);
+
+        // Set the custom StreamWriter as the Console's output
+        stdoutWriter.AutoFlush = true;
+
+        Console.SetOut(stdoutWriter);
 
         return await rootCommand.InvokeAsync(args);
     }
 
-    private static void Start(FileInfo file, bool jsonOutputOption, bool rawOutputOption, bool changeFileOption)
+    private static void Start(FileInfo file, bool jsonOutputOption, bool rawOutputOption, bool changeFileOption, bool ignoresVersionOption)
     {
         Stopwatch sw = new Stopwatch();
         sw.Start();
@@ -80,7 +93,7 @@ class Program
 
             // read the decompressed data into a new file
             var dat = new DatFile(decompressedBytes);
-            dat.ProcessFile();
+            dat.ProcessFile(ignoresVersionOption);
             
             // write decompressed data to disk if option is set
             if (changeFileOption)
@@ -117,17 +130,20 @@ class Program
         {
             // Exception handler for FileNotFoundException
             // We just inform the user that there is no such file
-            logger.Error($"The file {file} is not found.");
+            logger.Error(fnfe.Message);
+            Console.Error.WriteLine(fnfe.Message);
         }
         catch (IOException ioe)
         {
             // Exception handler for other input/output exceptions
             logger.Error(ioe.StackTrace);
+            Console.Error.WriteLine(ioe.Message);
         }
         catch (Exception ex)
         {
             // Exception handler for any other exception that may occur and was not already handled specifically
             logger.Error(ex.ToString());
+            Console.Error.WriteLine(ex.Message);
         }
 
         //Console.ReadKey();

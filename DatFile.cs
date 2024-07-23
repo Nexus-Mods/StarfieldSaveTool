@@ -93,7 +93,7 @@ public class DatFile(byte[] data)
         "SFBGS008.esm", "SFBGS006.esm", "SFBGS003.esm"
     };
 
-    public void ProcessFile()
+    public void ProcessFile(bool ignoreSaveVersionCheck)
     {
         using var ms = new MemoryStream(Data);
         using var br = new BinaryReader(ms);
@@ -112,13 +112,30 @@ public class DatFile(byte[] data)
         HeaderSize = br.ReadUInt32();
 
         Header = ReadHeader(br);
-
+        
         SaveVersion = br.ReadByte();
         CurrentGameVersionSize = br.ReadUInt16();
         CurrentGameVersion = Encoding.ASCII.GetString(br.ReadBytes(CurrentGameVersionSize));
         CreatedGameVersionSize = br.ReadUInt16();
         CreatedGameVersion = Encoding.ASCII.GetString(br.ReadBytes(CreatedGameVersionSize));
         PluginInfoSize = br.ReadUInt16();
+        
+        // do a save version check as we aren't supporting anything below 122
+
+        if (ignoreSaveVersionCheck)
+        {
+            _logger.Info("Ignoring save version check.");
+        }
+        else
+        {
+            _logger.Info("Checking for save version.");
+            
+            if (SaveVersion < 122)
+            {
+                //_logger.Error($"Save version {SaveVersion} is not supported.");
+                throw new Exception($"Save version {SaveVersion} is not supported.");
+            }
+        }
 
         PluginInfo = ReadPluginInfo(br, SaveVersion);
     }
@@ -170,9 +187,9 @@ public class DatFile(byte[] data)
     {
         var options = new JsonSerializerOptions
             { 
-                WriteIndented = true, 
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                TypeInfoResolver = SourceGenerationContext.Default
+                TypeInfoResolver = SourceGenerationContext.Default,
+                
             };
         return JsonSerializer.Serialize(this, options);
     }
@@ -192,7 +209,7 @@ public class DatFile(byte[] data)
         // loop through normal plugins
         for (int i = 0; i < pluginInfo.PluginCount; i++)
         {
-            pluginInfo.Plugins.Add(ReadPlugin(br));
+            pluginInfo.Plugins.Add(ReadPlugin(br, infoSaveVersion));
         }
 
         pluginInfo.LightPluginCount = br.ReadUInt16();
@@ -200,7 +217,7 @@ public class DatFile(byte[] data)
         // loop through light plugins
         for (int i = 0; i < pluginInfo.LightPluginCount; i++)
         {
-            pluginInfo.LightPlugins.Add(ReadPlugin(br));
+            pluginInfo.LightPlugins.Add(ReadPlugin(br, infoSaveVersion));
         }
 
         // previous save versions didn't have medium plugins
@@ -211,7 +228,7 @@ public class DatFile(byte[] data)
             // loop through medium plugins
             for (int i = 0; i < pluginInfo.MediumPluginCount; i++)
             {
-                pluginInfo.MediumPlugins.Add(ReadPlugin(br));
+                pluginInfo.MediumPlugins.Add(ReadPlugin(br, infoSaveVersion));
             }
         }
 
@@ -226,7 +243,7 @@ public class DatFile(byte[] data)
         return Encoding.ASCII.GetString(br.ReadBytes(size));
     }
 
-    private FilePlugin ReadPlugin(BinaryReader br)
+    private FilePlugin ReadPlugin(BinaryReader br, byte infoSaveVersion)
     {
         // record the current position
         // var offset = br.BaseStream.Position;
@@ -254,20 +271,24 @@ public class DatFile(byte[] data)
         */
 
         // non-native plugin so we are expecting some extra info and possibly creation info
+        
+        // previous save versions doesn't have this extra data
+        if (infoSaveVersion >= 122)
+        {
+            // creation name not always here
+            plugin.CreationNameSize = br.ReadUInt16();
+            if (plugin.CreationNameSize != 0)
+                plugin.CreationName = Encoding.ASCII.GetString(br.ReadBytes(plugin.CreationNameSize));
 
-        // creation name not always here
-        plugin.CreationNameSize = br.ReadUInt16();
-        if (plugin.CreationNameSize != 0)
-            plugin.CreationName = Encoding.ASCII.GetString(br.ReadBytes(plugin.CreationNameSize));
+            // creation id not always here
+            plugin.CreationIdSize = br.ReadUInt16();
+            if (plugin.CreationIdSize != 0)
+                plugin.CreationId = Encoding.ASCII.GetString(br.ReadBytes(plugin.CreationIdSize));
 
-        // creation id not always here
-        plugin.CreationIdSize = br.ReadUInt16();
-        if (plugin.CreationIdSize != 0)
-            plugin.CreationId = Encoding.ASCII.GetString(br.ReadBytes(plugin.CreationIdSize));
-
-        plugin.FlagsSize = br.ReadUInt16();
-        plugin.Flags = br.ReadBytes(plugin.FlagsSize);
-        plugin.AchievementFriendly = br.ReadByte();
+            plugin.FlagsSize = br.ReadUInt16();
+            plugin.Flags = br.ReadBytes(plugin.FlagsSize);
+            plugin.AchievementFriendly = br.ReadByte();
+        }
 
         _logger.Info($"{plugin.PluginName} is a normal plugin ({plugin.CreationName}).");
         return plugin;

@@ -4,9 +4,9 @@ A tool to decompress and convert Starfield save games to JSON format. Save games
 (`.sfs`) and this tool will decompress the data and output the metadata to JSON. Save games are normally found in the
 `C:\Users\<USERNAME>\Documents\My Games\Starfield\Saves` directory.
 
-Any help with the file format would be appreciated, the majority of unknowns are in the header of the compressed `sfs`
-file, and the plugins data within the decompressed file. I'm not including the main data blocks of the decompressed file
-as we are primarily interested in the metadata.
+This was primarily developed as part of the [Starfield](https://www.nexusmods.com/starfield) extension for [Vortex](https://www.nexusmods.com/site/mods/1), the mod manager created by [Nexus Mods](https://www.nexusmods.com/). 
+
+Any help with the file format would be appreciated, the majority of unknowns are in the header of the compressed `sfs` file, and the plugins data within the decompressed file. I'm not including the main data blocks of the decompressed file as we are primarily interested in the metadata.
 
 Thanks to Mod Organizer 2 for it's help to get started writing this tool and to help formalize this file format
 research. Special thanks to Silarn for the reverse engineering help.
@@ -19,8 +19,10 @@ This is all work in progress and there is plenty more with this file format that
 
 ## Usage
 
-The tool will always output JSON to the console. See below for options to write JSON to a file and to write the
-decompressed data to a file (useful for reverse engineering).
+> [!NOTE]  
+By default, the program will throw an error with a `SaveVersion` of less than `122`. This is mainly as the tool was written to allow the [Starfield](https://www.nexusmods.com/site/mods/634) extension for [Vortex](https://www.nexusmods.com/site/mods/1) to read save files. If you want to ignore this check, use the `--ignore-version` option and older save files will be parsed correctly as per the file format information below.
+
+The tool will always output JSON to the console. See below for options to write JSON to a file and to write the decompressed data to a file (useful for reverse engineering).
 
 ### Drag-and-drop
 
@@ -43,6 +45,7 @@ As the tool always outputs JSON to the console, you can use this tool via anothe
   -j, --output-json-file  Write JSON output to file [default: False]
   -r, --output-raw-file   Write raw output to file [default: False]
   -c, --change-file       Experimental: Writes the modified save file [default: False]
+  -i, --ignore-version    Ignore the SaveVersion check [default: False]
   --version               Show version information
   -?, -h, --help          Show help and usage information
 ```
@@ -152,7 +155,7 @@ Medium plugins were added in save file version 122. They are stored after the li
 There are different types of Plugin data blocks.
 
 * Native game plugins only contain the pluginName
-* Non-native plugins contain extra data, including Creation information and flags where appropriate. 
+* Non-native plugins (if `SaveVersion >= 122`) contain extra data, including Creation information and flags where appropriate. If an older SaveVersion, the extra data is not present.
 
 | Name           | Type     | Description         |
 |----------------|----------|---------------------|
