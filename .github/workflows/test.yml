@@ -12,12 +12,16 @@ jobs:
     - name: Set an output variable using PowerShell
       id: set-output
       run: |
-        $testOutput = "Hello, World!"
-        echo "testOutput=$testOutput" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+        $testOutput1 = "Hello, World!"
+        $testOutput2 = "Hi Simon"
+        echo "testOutput1=$testOutput1" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+        echo "testOutput2=$testOutput2" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
       shell: pwsh
 
     - name: Use the output variable using PowerShell
       run: |
-        $output = '${{ steps.set-output.outputs.testOutput }}'
-        Write-Host "The output variable value is: $output"
+        $output1 = '${{ steps.set-output.outputs.testOutput1 }}'
+        $output2 = '${{ steps.set-output.outputs.testOutput2 }}'
+        Write-Host "The output variable 1 value is: $output1"
+        Write-Host "The output variable 2 value is: $output2"
       shell: pwsh
