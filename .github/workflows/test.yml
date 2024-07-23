@@ -8,15 +8,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set an output variable
-        id: set-output
-        run: |
-          $testOutput = "Hello, World!"
-          echo "testOutput=$testOutput" >> $GITHUB_OUTPUT
-        shell: pwsh
 
-      - name: Use the output variable
-        run: |
-          $output = '${{ steps.set-output.outputs.testOutput }}'
-          Write-Host "The output variable value is: $output"
-        shell: pwsh
+    - name: Set an output variable
+      id: set-output
+      run: |
+        echo "testOutput=Hello, World!" >> $GITHUB_OUTPUT
+
+    - name: Use the output variable
+      run: |
+        echo "The output variable value is: ${{ steps.set-output.outputs.testOutput }}"
