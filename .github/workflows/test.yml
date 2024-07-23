@@ -12,7 +12,9 @@ jobs:
     - name: Set an output variable
       id: set-output
       run: |
-        echo "testOutput=Hello, World!" >> $GITHUB_OUTPUT
+        $testOutput = "Hello, World!"
+        echo "testOutput=$testOutput" >> $GITHUB_OUTPUT
+      shell: pwsh
 
     - name: Use the output variable
       run: |
