@@ -22,6 +22,7 @@ jobs:
         dotnet restore --packages .nuget --runtime win-x64
     - name: Extract Version from Project File
       id: extract-version
+      shell: pwsh
       run: |
         $csprojPath = (Get-ChildItem -Path . -Recurse -Filter *.csproj).FullName
         $version = [xml](Get-Content $csprojPath) | Select-Xml -XPath "//PropertyGroup/AssemblyVersion" | ForEach-Object { $_.Node.InnerXml }
@@ -29,16 +30,15 @@ jobs:
           $version = [xml](Get-Content $csprojPath) | Select-Xml -XPath "//PropertyGroup/Version" | ForEach-Object { $_.Node.InnerXml }
         }
         $semver = $version -replace '(\d+\.\d+\.\d+)\.\d+', '$1'  # Convert to semver by stripping the 4th part
-        echo "semver=$semver" >> $GITHUB_OUTPUT
-        echo "version=$version" >> $GITHUB_OUTPUT
-        echo "tag=v$semver" >> $GITHUB_OUTPUT
-      shell: pwsh
+        echo "semver=$semver" >> $env:$GITHUB_OUTPUT
+        echo "version=$version" >> $env:$GITHUB_OUTPUT
+        echo "tag=v$semver" >> $env:$GITHUB_OUTPUT
     - name: Display Version and Tag
-      run: | 
-        echo "Version (Assembly) ${{ steps.extract-version.outputs.version }}"
-        echo "Version (SemVer) ${{ steps.extract-version.outputs.semver }}"
-        echo "Tag ${{ steps.extract-version.outputs.tag }}"
       shell: pwsh
+      run: | 
+        echo "Version (Assembly): ${{ steps.extract-version.outputs.version }}"
+        echo "Version (SemVer): ${{ steps.extract-version.outputs.semver }}"
+        echo "Tag: ${{ steps.extract-version.outputs.tag }}"
     - name: Build       
       run: |
         dotnet build --configuration Release --no-restore
