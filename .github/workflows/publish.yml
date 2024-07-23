@@ -41,9 +41,9 @@ jobs:
         echo "version = $version"
         echo "semver = $semver"
         echo "tag = v$semver"
-        echo "version=$version" >> $GITHUB_OUTPUT
-        echo "semver=$semver" >> $GITHUB_OUTPUT
-        echo "tag=v$semver" >> $GITHUB_OUTPUT
+        echo "version=$version" >> $env:$GITHUB_OUTPUT
+        echo "semver=$semver" >> $env:$GITHUB_OUTPUT
+        echo "tag=v$semver" >> $env:$GITHUB_OUTPUT
     - name: Display Version and Tag
       shell: pwsh
       run: |
