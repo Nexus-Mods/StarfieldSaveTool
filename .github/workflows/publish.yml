@@ -10,7 +10,7 @@ on:
         description: "Create a draft release?"
         required: false
         type: boolean
-        default: true
+        default: false
 
 jobs:
   publish:
@@ -65,7 +65,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         # Artifact name
-        # name: # optional, default is artifact
+        name: "StarfieldSaveTool-${{ steps.extract-version.outputs.semver }}"
         # A file, directory or wildcard pattern that describes what to upload
         path: ${{ github.workspace }}/bin/Release/net8.0/win-x64/publish/**/*
         # The desired behavior if no files are found using the provided path.
@@ -77,5 +77,5 @@ jobs:
         files: ${{ github.workspace }}/bin/Release/net8.0/win-x64/publish/**/*
         prerelease: true
         draft: true
-        name: ${{ steps.extract-version.outputs.SEMVER }}
-        tag_name: ${{ steps.extract-version.outputs.TAG }} 
+        name: ${{ steps.extract-version.outputs.semver }}
+        tag_name: ${{ steps.extract-version.outputs.tag }} 
