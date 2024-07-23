@@ -1,0 +1,23 @@
+﻿name: Test GITHUB_OUTPUT
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-output:
+    runs-on: ubuntu-latest
+
+    steps:
+      - 
+      - name: Set an output variable
+        id: set-output
+        run: |
+          $testOutput = "Hello, World!"
+          echo "testOutput=$testOutput" >> $GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Use the output variable
+        run: |
+          $output = '${{ steps.set-output.outputs.testOutput }}'
+          Write-Host "The output variable value is: $output"
+        shell: pwsh
