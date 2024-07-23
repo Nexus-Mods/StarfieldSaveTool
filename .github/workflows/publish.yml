@@ -20,6 +20,18 @@ jobs:
     - name: Restore dependencies
       run: |
         dotnet restore --packages .nuget --runtime win-x64
+    - name: Extract Assembly Version
+      id: extract-version
+      run: |
+        $csprojPath = (Get-ChildItem -Path . -Recurse -Filter *.csproj).FullName
+        $version = [xml](Get-Content $csprojPath) | Select-Xml -XPath "//PropertyGroup/AssemblyVersion" | ForEach-Object { $_.Node.InnerXml }
+        if (-not $version) {
+          $version = [xml](Get-Content $csprojPath) | Select-Xml -XPath "//PropertyGroup/Version" | ForEach-Object { $_.Node.InnerXml }
+        }
+        echo "##[set-output name=version;]$version"
+      shell: pwsh
+    - name: Display Assembly Version
+      run: echo "Assembly Version: ${{ steps.extract-version.outputs.version }}"
     - name: Build       
       run: |
         dotnet build --configuration Release --no-restore
