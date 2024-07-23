@@ -41,15 +41,15 @@ jobs:
         echo "semver=$semver"
         echo "version=$version"
         echo "tag=v$semver"
-        echo "semver=$semver" >> $GITHUB_OUTPUT
-        echo "version=$version" >> $GITHUB_OUTPUT
-        echo "tag=v$semver" >> $GITHUB_OUTPUT
+        echo "SEMVER=$semver" >> $GITHUB_ENV
+        echo "VERSION=$version" >> $GITHUB_ENV
+        echo "TAG=v$semver" >> $GITHUB_ENV
     - name: Display Version and Tag
       shell: pwsh
       run: | 
-        echo "Raw Version: ${{ steps.extract-version.outputs.version }}"
-        echo "SemVer Version: ${{ steps.extract-version.outputs.semver }}"
-        echo "Tag: ${{ steps.extract-version.outputs.tag }}"
+        echo "Raw Version: ${{ env.VERSION }}"
+        echo "SemVer Version: ${{ env.SEMVER }}"
+        echo "Tag: ${{ env.TAG }}"
     - name: Build       
       run: |
         dotnet build --configuration Release --no-restore
