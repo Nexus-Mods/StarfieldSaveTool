@@ -45,11 +45,10 @@ jobs:
         echo "VERSION=$version" >> $GITHUB_ENV
         echo "TAG=v$semver" >> $GITHUB_ENV
     - name: Display Version and Tag
-      shell: pwsh
       run: | 
-        echo "Raw Version: ${{ env.VERSION }}"
-        echo "SemVer Version: ${{ env.SEMVER }}"
-        echo "Tag: ${{ env.TAG }}"
+        echo "Raw Version ${{ env.VERSION }}"
+        echo "SemVer Version ${{ env.SEMVER }}"
+        echo "Tag ${{ env.TAG }}"
     - name: Build       
       run: |
         dotnet build --configuration Release --no-restore
