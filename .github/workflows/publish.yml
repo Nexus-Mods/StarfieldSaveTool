@@ -38,18 +38,20 @@ jobs:
           $version = [xml](Get-Content $csprojPath) | Select-Xml -XPath "//PropertyGroup/Version" | ForEach-Object { $_.Node.InnerXml }
         }
         $semver = $version -replace '(\d+\.\d+\.\d+)\.\d+', '$1'  # Convert to semver by stripping the 4th part
+        $tag="v$semver"
+        
         echo "version = $version"
         echo "semver = $semver"
-        echo "tag = v$semver"
+        echo "tag = $tag"
         echo "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
         echo "semver=$semver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
-        echo "tag=v$semver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+        echo "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
     - name: Display Version and Tag
       shell: pwsh
       run: |
-        $version = "${{ steps.extract-version.outputs.version }}"
-        $semver = "${{ steps.extract-version.outputs.semver }}"
-        $tag = "${{ steps.extract-version.outputs.tag }}"
+        $version = '${{ steps.extract-version.outputs.version }}'
+        $semver = '${{ steps.extract-version.outputs.semver }}'
+        $tag = '${{ steps.extract-version.outputs.tag }}'
         Write-Host "Version: $version"
         Write-Host "SemVer: $semver"
         Write-Host "Tag: $tag"
