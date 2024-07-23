@@ -31,7 +31,7 @@ jobs:
         echo "##[set-output name=version;]$version"
       shell: pwsh
     - name: Display Assembly Version
-      run: echo "Assembly Version: ${{ steps.extract-version.outputs.version }}"
+      run: echo "Assembly Version ${{ steps.extract-version.outputs.version }}"
     - name: Build       
       run: |
         dotnet build --configuration Release --no-restore
