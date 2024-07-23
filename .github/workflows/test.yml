@@ -9,13 +9,15 @@ jobs:
 
     steps:
 
-    - name: Set an output variable
+    - name: Set an output variable using PowerShell
       id: set-output
       run: |
         $testOutput = "Hello, World!"
-        echo "testOutput=$testOutput" >> $GITHUB_OUTPUT
+        echo "testOutput=$testOutput" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
       shell: pwsh
 
-    - name: Use the output variable
+    - name: Use the output variable using PowerShell
       run: |
-        echo "The output variable value is: ${{ steps.set-output.outputs.testOutput }}"
+        $output = '${{ steps.set-output.outputs.testOutput }}'
+        Write-Host "The output variable value is: $output"
+      shell: pwsh
