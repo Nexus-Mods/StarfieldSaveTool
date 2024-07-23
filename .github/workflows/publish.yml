@@ -38,6 +38,9 @@ jobs:
           $version = [xml](Get-Content $csprojPath) | Select-Xml -XPath "//PropertyGroup/Version" | ForEach-Object { $_.Node.InnerXml }
         }
         $semver = $version -replace '(\d+\.\d+\.\d+)\.\d+', '$1'  # Convert to semver by stripping the 4th part
+        echo "semver=$semver"
+        echo "version=$version"
+        echo "tag=v$semver"
         echo "semver=$semver" >> $GITHUB_OUTPUT
         echo "version=$version" >> $GITHUB_OUTPUT
         echo "tag=v$semver" >> $GITHUB_OUTPUT
