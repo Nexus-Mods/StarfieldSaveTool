@@ -63,6 +63,7 @@ jobs:
         dotnet publish -c Release -r win-x64
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
+      id: upload-artifact
       with:
         # Artifact name
         name: "StarfieldSaveTool-${{ steps.extract-version.outputs.semver }}"
@@ -74,8 +75,8 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: ${{ inputs.release == true }}
       with:
-        files: ${{ github.workspace }}/bin/Release/net8.0/win-x64/publish/**/*
+        files: ${{ steps.upload-artifact.outputs.artifact-url }}
         prerelease: true
         draft: true
-        name: ${{ steps.extract-version.outputs.semver }}
-        tag_name: ${{ steps.extract-version.outputs.tag }} 
+        name: "${{ steps.extract-version.outputs.semver }}-test"
+        tag_name: "${{ steps.extract-version.outputs.tag }}-test" 
