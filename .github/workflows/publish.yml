@@ -43,14 +43,14 @@ jobs:
         echo "version = $version"
         echo "semver = $semver"
         echo "tag = $tag"
-        echo "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
-        echo "semver=$semver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+        echo "rawVersion=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+        echo "semverVersion=$semver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
         echo "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
     - name: Display Version and Tag
       shell: pwsh
       run: |
-        $version = '${{ steps.extract-version.outputs.version }}'
-        $semver = '${{ steps.extract-version.outputs.semver }}'
+        $version = '${{ steps.extract-version.outputs.rawVersion }}'
+        $semver = '${{ steps.extract-version.outputs.semverVersion }}'
         $tag = '${{ steps.extract-version.outputs.tag }}'
         Write-Host "Version: $version"
         Write-Host "SemVer: $semver"
