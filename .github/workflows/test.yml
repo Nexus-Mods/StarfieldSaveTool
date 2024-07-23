@@ -14,8 +14,8 @@ jobs:
       run: |
         $testOutput1 = "Hello, World!"
         $testOutput2 = "Hi Simon"
-        echo "testOutput1=$testOutput1" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
-        echo "testOutput2=$testOutput2" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+        echo "testOutput1=$testOutput1" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        echo "testOutput2=$testOutput2" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       shell: pwsh
 
     - name: Use the output variable using PowerShell
