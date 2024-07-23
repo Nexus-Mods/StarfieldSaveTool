@@ -45,13 +45,14 @@ jobs:
         echo "SEMVER=$semver" >> $GITHUB_OUTPUT
         echo "TAG=v$semver" >> $GITHUB_OUTPUT
     - name: Display Version and Tag
+      shell: pwsh
       run: |
         $version = '${{ steps.extract-version.outputs.VERSION }}'
         $semver = '${{ steps.extract-version.outputs.SEMVER }}'
         $tag = '${{ steps.extract-version.outputs.TAG }}'
-        echo "Version: $version"
-        echo "SemVer: $semver"
-        echo "Tag: $tag"
+        Write-Host "Version: $version"
+        Write-Host "SemVer: $semver"
+        Write-Host "Tag: $tag"
     - name: Build       
       run: |
         dotnet build --configuration Release --no-restore
@@ -71,12 +72,8 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: ${{ inputs.release == true }}
       with:
-        files: |
-          ./dist/vortex-setup-*.*.*.exe 
-          ./dist/latest.yml 
-          ./dist/alpha.yml 
-          ./dist/beta.yml 
+        files: ${{ github.workspace }}/bin/Release/net8.0/win-x64/publish/**/*
         prerelease: true
         draft: true
-        name: ${{ steps.setOutputs.outputs.rawVersion }}
-        tag_name: ${{ steps.setOutputs.outputs.tagVersion }} 
+        name: ${{ steps.extract-version.outputs.SEMVER }}
+        tag_name: ${{ steps.extract-version.outputs.TAG }} 
