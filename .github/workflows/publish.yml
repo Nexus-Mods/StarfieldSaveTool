@@ -5,6 +5,12 @@ name: Publish
 
 on:
   workflow_dispatch:
+    inputs:
+      release:
+        description: "Create a draft release?"
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   publish:
@@ -12,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Show Inputs
+      run: echo "${{ toJSON(github.event.inputs) }}"
     - uses: actions/checkout@v4
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -30,14 +38,14 @@ jobs:
           $version = [xml](Get-Content $csprojPath) | Select-Xml -XPath "//PropertyGroup/Version" | ForEach-Object { $_.Node.InnerXml }
         }
         $semver = $version -replace '(\d+\.\d+\.\d+)\.\d+', '$1'  # Convert to semver by stripping the 4th part
-        echo "semver=$semver" >> $env:$GITHUB_OUTPUT
-        echo "version=$version" >> $env:$GITHUB_OUTPUT
-        echo "tag=v$semver" >> $env:$GITHUB_OUTPUT
+        echo "semver=$semver" >> $GITHUB_OUTPUT
+        echo "version=$version" >> $GITHUB_OUTPUT
+        echo "tag=v$semver" >> $GITHUB_OUTPUT
     - name: Display Version and Tag
       shell: pwsh
       run: | 
-        echo "Version (Assembly): ${{ steps.extract-version.outputs.version }}"
-        echo "Version (SemVer): ${{ steps.extract-version.outputs.semver }}"
+        echo "Raw Version: ${{ steps.extract-version.outputs.version }}"
+        echo "SemVer Version: ${{ steps.extract-version.outputs.semver }}"
         echo "Tag: ${{ steps.extract-version.outputs.tag }}"
     - name: Build       
       run: |
@@ -54,3 +62,16 @@ jobs:
         path: ${{ github.workspace }}/bin/Release/net8.0/win-x64/publish/**/*
         # The desired behavior if no files are found using the provided path.
         # if-no-files-found: # optional, default is warn
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: ${{ inputs.release == true }}
+      with:
+        files: |
+          ./dist/vortex-setup-*.*.*.exe 
+          ./dist/latest.yml 
+          ./dist/alpha.yml 
+          ./dist/beta.yml 
+        prerelease: true
+        draft: true
+        name: ${{ steps.setOutputs.outputs.rawVersion }}
+        tag_name: ${{ steps.setOutputs.outputs.tagVersion }} 
