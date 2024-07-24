@@ -93,14 +93,17 @@ typedef struct {
     if( !isGamePlugin(pluginName) ) {
         
         // isn't game plugin so we are expecting some extra info
-
-        ushort creationNameSize;
-        char creationName[creationNameSize]; 
-        ushort creationIdSize;
-        char creationId[creationIdSize];            
-        ushort flagsSize;
-        byte flags[flagsSize];
-        byte achivementFriendly;
+                
+        if(header.saveVersion >= 122) { // newer save format support creations and have extra data                  
+                
+            ushort creationNameSize;
+            char creationName[creationNameSize]; 
+            ushort creationIdSize;
+            char creationId[creationIdSize];            
+            ushort flagsSize;
+            byte flags[flagsSize];
+            byte achivementFriendly;
+        }
         
         Printf("%s is a plugin\n", pluginName);       
         
@@ -109,7 +112,7 @@ typedef struct {
         Printf("%s is a game plugin\n", pluginName); 
     }  
     
-} PLUGIN;
+} PLUGIN <name=pluginName>;
 
 typedef struct {
     byte unknown0;
@@ -176,6 +179,13 @@ char magic[12];    //0x04034b50
 uint headerSize;   // starting after this int
 HEADER header;
 INFO info;
+
+if(header.saveVersion < 122) { // newer save format support creations and have extra data       
+      
+    Printf("Old save version (%d)\n", header.saveVersion);
+    Warning("Old save version (%d)", header.saveVersion);
+}
+
 PLUGIN_INFO pluginInfo;
 NEW_BLOCK newBlock;
 NEW_BLOCK2 newBlock2;

@@ -9,6 +9,7 @@ namespace StarfieldSaveTool;
 class Program
 {
     private static Logger logger;
+    private const int BufferSize = 65536; // 64 KB
    
     static async Task<int> Main(string[] args)
     {
@@ -35,12 +36,12 @@ class Program
         var config = new NLog.Config.LoggingConfiguration();
 
         // create a console logging target
-        var logConsole = new NLog.Targets.ConsoleTarget();
+        //var logConsole = new NLog.Targets.ConsoleTarget();
 
         var debugConsole = new NLog.Targets.DebugSystemTarget();
 
         // send logs with levels from Info to Fatal to the console
-        config.AddRule(NLog.LogLevel.Warn, NLog.LogLevel.Fatal, logConsole);
+        //config.AddRule(NLog.LogLevel.Warn, NLog.LogLevel.Fatal, logConsole);
         // send logs with levels from Debug to Fatal to the console
         config.AddRule(NLog.LogLevel.Debug, NLog.LogLevel.Fatal, debugConsole);
 
@@ -49,6 +50,16 @@ class Program
 
         // create a logger
         logger = LogManager.GetCurrentClassLogger();
+        
+        // need a bigger stdout buffer for large files
+
+        // Create a new StreamWriter with the desired buffer size
+        var stdoutWriter = new StreamWriter(Console.OpenStandardOutput(), new UTF8Encoding(false), BufferSize);
+
+        // Set the custom StreamWriter as the Console's output
+        stdoutWriter.AutoFlush = true;
+
+        Console.SetOut(stdoutWriter);
 
         return await rootCommand.InvokeAsync(args);
     }
@@ -117,17 +128,20 @@ class Program
         {
             // Exception handler for FileNotFoundException
             // We just inform the user that there is no such file
-            logger.Error($"The file {file} is not found.");
+            logger.Error(fnfe.Message);
+            Console.Error.WriteLine(fnfe.Message);
         }
         catch (IOException ioe)
         {
             // Exception handler for other input/output exceptions
             logger.Error(ioe.StackTrace);
+            Console.Error.WriteLine(ioe.Message);
         }
         catch (Exception ex)
         {
             // Exception handler for any other exception that may occur and was not already handled specifically
             logger.Error(ex.ToString());
+            Console.Error.WriteLine(ex.Message);
         }
 
         //Console.ReadKey();
