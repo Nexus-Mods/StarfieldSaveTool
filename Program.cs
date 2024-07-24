@@ -15,7 +15,6 @@ class Program
     {
         var fileArgument = new Argument<FileInfo>(name: "file", description: "Starfield Save File (.sfs) to read");
         
-        var ignoresVersionOption = new Option<bool>(new[] { "--ignore-version", "-i" }, () => false, "Ignores version check and processes file anyway");
         var jsonOutputOption = new Option<bool>(new[] { "--output-json-file", "-j" }, () => false, "Write JSON output to file");
         var rawOutputOption = new Option<bool>(new[] { "--output-raw-file", "-r" }, () => false, "Write raw output to file");
         var changeFileOption = new Option<bool>(new[] { "--change-file", "-c" }, () => false, "Test change and write back to file");
@@ -25,12 +24,11 @@ class Program
             fileArgument,
             jsonOutputOption,
             rawOutputOption,
-            changeFileOption,
-            ignoresVersionOption
+            changeFileOption
         };
         
 
-        rootCommand.SetHandler(Start, fileArgument, jsonOutputOption, rawOutputOption, changeFileOption, ignoresVersionOption);
+        rootCommand.SetHandler(Start, fileArgument, jsonOutputOption, rawOutputOption, changeFileOption);
 
         // logging stuff
 
@@ -66,7 +64,7 @@ class Program
         return await rootCommand.InvokeAsync(args);
     }
 
-    private static void Start(FileInfo file, bool jsonOutputOption, bool rawOutputOption, bool changeFileOption, bool ignoresVersionOption)
+    private static void Start(FileInfo file, bool jsonOutputOption, bool rawOutputOption, bool changeFileOption)
     {
         Stopwatch sw = new Stopwatch();
         sw.Start();
@@ -93,7 +91,7 @@ class Program
 
             // read the decompressed data into a new file
             var dat = new DatFile(decompressedBytes);
-            dat.ProcessFile(ignoresVersionOption);
+            dat.ProcessFile();
             
             // write decompressed data to disk if option is set
             if (changeFileOption)

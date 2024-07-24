@@ -1,15 +1,12 @@
 # StarfieldSaveTool
 
-A tool to decompress and convert Starfield save games to JSON format. Save games are stored in a compressed format
-(`.sfs`) and this tool will decompress the data and output the metadata to JSON. Save games are normally found in the
-`C:\Users\<USERNAME>\Documents\My Games\Starfield\Saves` directory.
+A tool to decompress and convert Starfield save games to JSON format. Save games are stored in a compressed format (`.sfs`) and this tool will decompress the data and output the metadata to JSON. Save games are normally found in the `C:\Users\<USERNAME>\Documents\My Games\Starfield\Saves` directory.
 
 This was primarily developed as part of the [Starfield](https://www.nexusmods.com/starfield) extension for [Vortex](https://www.nexusmods.com/site/mods/1), the mod manager created by [Nexus Mods](https://www.nexusmods.com/). 
 
 Any help with the file format would be appreciated, the majority of unknowns are in the header of the compressed `sfs` file, and the plugins data within the decompressed file. I'm not including the main data blocks of the decompressed file as we are primarily interested in the metadata.
 
-Thanks to Mod Organizer 2 for it's help to get started writing this tool and to help formalize this file format
-research. Special thanks to Silarn for the reverse engineering help.
+Thanks to Mod Organizer 2 for it's help to get started writing this tool and to help formalize this file format research. Special thanks to Silarn for the reverse engineering help.
 
 ## Contribute
 
@@ -19,15 +16,11 @@ This is all work in progress and there is plenty more with this file format that
 
 ## Usage
 
-> [!NOTE]  
-By default, the program will throw an error with a `SaveVersion` of less than `122`. This is mainly as the tool was written to allow the [Starfield](https://www.nexusmods.com/site/mods/634) extension for [Vortex](https://www.nexusmods.com/site/mods/1) to read save files. If you want to ignore this check, use the `--ignore-version` option and older save files will be parsed correctly as per the file format information below.
-
 The tool will always output JSON to the console. See below for options to write JSON to a file and to write the decompressed data to a file (useful for reverse engineering).
 
 ### Drag-and-drop
 
-The simplest way to use the tool is to drag-and-drop a save file (`.sfs`) onto the `Launch.bat` file. This uses
-the `--output-json-file` and `--output-raw-file` options below.
+The simplest way to use the tool is to drag-and-drop a save file (`.sfs`) onto the `Launch.bat` file. This uses the `--output-json-file` and `--output-raw-file` options below.
 
 ### Command Line
 
@@ -45,7 +38,6 @@ As the tool always outputs JSON to the console, you can use this tool via anothe
   -j, --output-json-file  Write JSON output to file [default: False]
   -r, --output-raw-file   Write raw output to file [default: False]
   -c, --change-file       Experimental: Writes the modified save file [default: False]
-  -i, --ignore-version    Ignore the SaveVersion check [default: False]
   --version               Show version information
   -?, -h, --help          Show help and usage information
 ```
@@ -67,8 +59,7 @@ See [Example.json](Example.json) for a complete JSON export.
 
 ## Starfield Save file (.SFS)
 
-The `.sfs` file is a compressed file format used by Starfield. The file format is a series of compressed data
-chunks in the Zlib format. The data chunks are compressed using the `Deflate` algorithm using Fast Compression. Here is a work-in-progress breakdown of the binary file format.
+The `.sfs` file is a compressed file format used by Starfield. The file format is a series of compressed data chunks in the Zlib format. The data chunks are compressed using the `Deflate` algorithm using Fast Compression. Here is a work-in-progress breakdown of the binary file format.
 
 | Name                   | Type      | Description                                                                                                     |
 |------------------------|-----------|-----------------------------------------------------------------------------------------------------------------|

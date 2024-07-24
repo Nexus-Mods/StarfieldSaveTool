@@ -4,9 +4,8 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Common Changelog](https://common-changelog.org/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.0] - 2024-07-23
+## [1.2.0] - 2024-07-24
 
-- Added check for `SaveVersion` to ensure the save file is compatible with the tool. This check can be ignored using `--ignore-version`. See [Readme.md](https://github.com/Nexus-Mods/StarfieldSaveTool/blob/master/README.md) for more information.
 - Increased stdout buffer size to 64 KB to handle larger save files
 - De-prettied (uglied? uglified?! made ugly!?!) the JSON output to save buffer size
 - Packaging with NativeAOT to improve performance

@@ -93,7 +93,7 @@ public class DatFile(byte[] data)
         "SFBGS008.esm", "SFBGS006.esm", "SFBGS003.esm"
     };
 
-    public void ProcessFile(bool ignoreSaveVersionCheck)
+    public void ProcessFile()
     {
         using var ms = new MemoryStream(Data);
         using var br = new BinaryReader(ms);
@@ -120,23 +120,6 @@ public class DatFile(byte[] data)
         CreatedGameVersion = Encoding.ASCII.GetString(br.ReadBytes(CreatedGameVersionSize));
         PluginInfoSize = br.ReadUInt16();
         
-        // do a save version check as we aren't supporting anything below 122
-
-        if (ignoreSaveVersionCheck)
-        {
-            _logger.Info("Ignoring save version check.");
-        }
-        else
-        {
-            _logger.Info("Checking for save version.");
-            
-            if (SaveVersion < 122)
-            {
-                //_logger.Error($"Save version {SaveVersion} is not supported.");
-                throw new Exception($"Save version {SaveVersion} is not supported.");
-            }
-        }
-
         PluginInfo = ReadPluginInfo(br, SaveVersion);
     }
 
