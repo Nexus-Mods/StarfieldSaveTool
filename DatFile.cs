@@ -228,32 +228,38 @@ public class DatFile(byte[] data)
 
     private FilePlugin ReadPlugin(BinaryReader br, byte infoSaveVersion)
     {
-        // record the current position
-        // var offset = br.BaseStream.Position;
-
+        // blank plugin
         var plugin = new FilePlugin();
 
         // read the plugin name
         plugin.PluginName = ReadString(br);
-
-        // reset the position
-        //br.BaseStream.Seek(offset, SeekOrigin.Begin);
-
-        if (NATIVE_PLUGINS.Contains(plugin.PluginName))
+        
+        // if save version is 140 or higher, then the next byte is a flag for extra data or not
+        // if it doesn't, then just return as it's probably a native plugin
+        if (infoSaveVersion >= 140)
         {
-            _logger.Info($"{plugin.PluginName} is a native plugin.");
-            return plugin;
+            var hasExtraData = br.ReadByte();
+            
+            if (hasExtraData == 0)
+            {
+                _logger.Info($"{plugin.PluginName} has no extra data.");
+                return plugin;
+            }
+        }
+        else
+        {
+            // if save version is less than 140, then we have to use the native plugins list to
+            // determine if it will have extra data or not
+        
+            // if it's a native plugin then we are done
+            if (NATIVE_PLUGINS.Contains(plugin.PluginName))
+            {
+                _logger.Info($"{plugin.PluginName} is a native plugin.");
+                return plugin;
+            }
         }
 
-        /*
-        // read ahead if next short is 00 then it's a creation plugin
-        var nextShort = br.ReadUInt16();
-
-        // reset position
-        br.BaseStream.Seek(-2, SeekOrigin.Current);
-        */
-
-        // non-native plugin so we are expecting some extra info and possibly creation info
+        // non-native plugin OR flag is set to show we are expecting some extra info and possibly creation info
         
         // previous save versions doesn't have this extra data
         if (infoSaveVersion >= 122)

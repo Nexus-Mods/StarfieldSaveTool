@@ -88,7 +88,7 @@ Below is the file that is decompressed from the compressed chunks in the `.sfs` 
 | magic                  | `char[12]`                  | Magic bytes `"SFS_SAVEGAME"`              |
 | headerSize             | `uint`                      | Size of header                            |
 | header                 | [HEADER](#HEADER)           | Header data block                         |
-| saveVersion            | `byte`                      | Save file format version. Currently `122` |
+| saveVersion            | `ubyte`                     | Save file format version. Currently `122` |
 | currentGameVersionSize | `ushort`                    | Size of the current game version string   |
 | currentGameVersion     | `string`                    | Current game version string               |
 | createdGameVersionSize | `ushort`                    | Size of the created game version string   |
@@ -147,11 +147,13 @@ There are different types of Plugin data blocks.
 
 * Native game plugins only contain the pluginName
 * Non-native plugins (if `SaveVersion >= 122`) contain extra data, including Creation information and flags where appropriate. If an older SaveVersion, the extra data is not present.
+* If `SaveVersion >= 140`, there is an extra byte to indicate if there is extra data for the plugin.
 
-| Name           | Type     | Description         |
-|----------------|----------|---------------------|
-| pluginNameSize | `ushort` | Size of plugin name |
-| pluginName     | `string` | Plugin name         |
+| Name           | Type          | Description         | Comment                           |
+|----------------|---------------|---------------------|-----------------------------------|
+| pluginNameSize | `ushort`      | Size of plugin name |                                   |
+| pluginName     | `string`      | Plugin name         |                                   |
+| extraInfo      | `ubyte` | 0=no, 1=yes           | Only exists if `SaveVersion >= 140` |
 
 #### Extra Data
 

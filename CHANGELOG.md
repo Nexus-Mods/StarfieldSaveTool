@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Common Changelog](https://common-changelog.org/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2024-09-02
+
+- Updated to support save version 140 that was added in Starfield 1.13.61.0
+
 ## [1.2.0] - 2024-07-24
 
 - Increased stdout buffer size to 64 KB to handle larger save files
@@ -24,6 +28,7 @@ The format is based on [Common Changelog](https://common-changelog.org/) and thi
 
 - Initial release
 
+[1.3.0]: https://github.com/Nexus-Mods/StarfieldSaveTool/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Nexus-Mods/StarfieldSaveTool/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Nexus-Mods/StarfieldSaveTool/releases/tag/v1.1.0
 [1.0.1]: https://github.com/Nexus-Mods/StarfieldSaveTool/releases/tag/v1.0.1
