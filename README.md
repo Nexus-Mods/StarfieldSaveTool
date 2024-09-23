@@ -34,7 +34,7 @@ As the tool always outputs JSON to the console, you can use this tool via anothe
 
 #### Options
 
-```shell
+```
   -j, --output-json-file  Write JSON output to file [default: False]
   -r, --output-raw-file   Write raw output to file [default: False]
   -c, --change-file       Experimental: Writes the modified save file [default: False]
