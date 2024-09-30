@@ -103,7 +103,7 @@ Rest of file has not been worked out yet.
 | Name               | Type       | Description                                                                       |
 |--------------------|------------|-----------------------------------------------------------------------------------| 
 | engineVersion     | `uint`     | Engine version? This is `27`, Fallout 4 was `11`.                                 |
-| saveVersion        | `byte`     | Save file format version. Currently `122`                                         |
+| saveVersion        | `byte`     | Save file format version. Currently `143`                                         |
 | saveNumber         | `uint`     | Incremented by 1 each time overwritten                                            |
 | playerNameSize     | `ushort`   | Size of player name string                                                        |
 | playerName         | `string`   | Player Name. Not used in game, only used for load screen?                         |
